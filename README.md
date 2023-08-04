@@ -1,12 +1,42 @@
 # CineBank
 
-Open source local video management solution for Windows. Manage all your movies and series inside a central tool, store metadata and launch them in your prefered media player.
+Open source local video management solution for Windows. Manage all your movies and series inside a central tool, store metadata and launch them in your preferred media player.  
+Mounting your ISOs or playing any type of media file can be achieved through completely customizable PowerShell-scripts. To avoid that unauthorized users mess with your scripts, integrity checks can be enabled. 
 
 Third implementation of its kind. Last try: [LocalCineBank](https://git.0raptor.earth/Raptor/LocalCineBank) (never published)
 
+For information about the design of the application check [Developer Manual](DEV.md).
+
 ## Installation
 
+1. Download latest release from [Missing]()
+2. Extract software on your machine
+3. Adapt powershell scripts
+4. Run initial configuration
+5. (optional) Create a desktop shortcut
+6. Start applicaton
+
 ## Initial configuration
+
+Next to the main executable there must be a file called `config.xml`. This is the primary configuration file.  
+The file will be created automatically if you run the `UpdateConfiguration.ps1`-script during installation!
+
+> After changing the configuration run `UpdateConfiguration.ps1`-script to update the checksum in the registry! Otherwise the changed config will be rejected as malicious.
+> If you don not want to validate the scripts and config you can disable them through the script and configuration
+
+```XML
+<xml>
+	<config>
+		<validateChecksums>true</validateChecksums><!-- if true prgram will validate that config has not been changed using checksum in HKLM:\SOFTWARE\CineBank\ConfigCksm -->
+		<baseDir></baseDir><!-- OPTIONAL: Specify a baseDir and store relative paths in the databse. This parameter overrides the baseDir specified in the database -->
+		<dbPath></dbPath> <!-- OPTIONAL: Path to SQLite-database to load at startup. If not specified must be supplied via commandline parameter -->
+	</config>
+	<checksums>
+		<!-- contains checksums of powershell skripts used by the program to play files - program will check their integrity during start -->
+		<!-- as the checksum of the config itself will be validated these checksums could not have been modified without administrative rights on your system -->
+	</checksums>
+</xml>
+```
 
 ## License
 

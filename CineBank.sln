@@ -7,6 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CineBank", "CineBank\CineBa
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projektmappenelemente", "Projektmappenelemente", "{C06DC880-0996-4DB9-98A0-0A3B5AC7D557}"
 	ProjectSection(SolutionItems) = preProject
+		DEV.md = DEV.md
 		README.md = README.md
 	EndProjectSection
 EndProject

@@ -200,7 +200,7 @@
                         <TextBlock Grid.Row="13" Grid.Column="1" x:Name="tbResolution" Margin="10,5" FontSize="14" TextWrapping="Wrap"></TextBlock>
 
                         <TextBlock Grid.Row="14" Grid.Column="0" Text="Format:" Margin="10,5" FontSize="14"></TextBlock>
-                        <TextBlock Grid.Row="14" Grid.Column="1" x:Name="tb" Margin="10,5" FontSize="14" TextWrapping="Wrap"></TextBlock>
+                        <TextBlock Grid.Row="14" Grid.Column="1" x:Name="tbFormat" Margin="10,5" FontSize="14" TextWrapping="Wrap"></TextBlock>
                     </Grid>
                 </Grid>
             </ScrollViewer>
