@@ -15,17 +15,20 @@
         <DockPanel Grid.Row="0">
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
-                    <MenuItem Header="_Import Movie (F1)"/>
-                    <MenuItem Header="_Settings (F2)"/>
-                    <MenuItem Header="_Refresh (F5)"/>
+                    <MenuItem Header="_Add Movie (F1)" Click="MenuItem_Add_Click"/>
+                    <MenuItem Header="_Settings (F2)" Click="MenuItem_Settings_Click"/>
+                    <MenuItem Header="_Refresh (F5)" Click="MenuItem_Reload_Click"/>
                     <Separator />
                     <MenuItem Header="_Open Database"/>
                     <MenuItem Header="_New Database"/>
                     <MenuItem Header="_Create Database From Legacy Folder Structure"/>
                     <Separator />
-                    <MenuItem Header="_Exit" Click="MenuItem_Click"/>
+                    <MenuItem Header="_Exit" Click="MenuItem_Exit_Click"/>
                 </MenuItem>
                 <MenuItem Header="_Edit">
+                    <MenuItem Header="_Add Movie (F1)" Click="MenuItem_Add_Click"/>
+                    <MenuItem Header="_Delete Entry (DEL)" Click="MenuItem_Delete_Click"/>
+                    <Separator/>
                     <MenuItem Header="_Lauch MP4"/>
                     <MenuItem Header="_Lauch Video File"/>
                     <MenuItem Header="_Lauch DVD ISO"/>

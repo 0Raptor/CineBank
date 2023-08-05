@@ -54,6 +54,7 @@ namespace CineBank
 
             SolveForeignKeys(id);
         }
+
         /// <summary>
         /// Updates the entry of this object in the database.
         /// </summary>
@@ -62,10 +63,30 @@ namespace CineBank
 
         }
 
+        /// <summary>
+        /// Removes the item from the database
+        /// </summary>
+        public void Delete()
+        {
+
+        }
+
         public enum MovieType : ushort
         {
             Movie = 0,
             Series = 1
+        }
+
+        /// <summary>
+        /// Reads all movie entries from the given database.
+        /// </summary>
+        /// <param name="db">Database-Object to qurey from</param>
+        /// <param name="filter">(OPTIONAL) Search parameter to limit the results</param>
+        /// <returns>A list of movie objects</returns>
+        public static List<Movie> GetMovies(Database db, string filter = "")
+        {
+            List<Movie> movies = new List<Movie>();
+            return movies;
         }
     }
 
@@ -86,11 +107,12 @@ namespace CineBank
         {
             Generic = 0,
             Image = 1,
-            Video = 2,
-            ISO = 3,
-            DVDFolder = 4,
-            AVCHDFolder = 5,
-            BRFolder = 6
+            Audio = 2,
+            Video = 3,
+            ISO = 4,
+            DVDFolder = 5,
+            AVCHDFolder = 6,
+            BRFolder = 7
         }
 
         /// <summary>
@@ -100,10 +122,11 @@ namespace CineBank
         {
             Undefined = 0,
             None = 1,
-            MP4Player = 2,
-            MKVPlayer = 3,
+            Video1 = 2,
+            Video2 = 3,
             DVDPlayer = 4,
-            BRPlayer = 5
+            BRPlayer = 5,
+            AudioPlayer = 6
         }
     }
 }

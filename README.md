@@ -25,6 +25,7 @@ The file will be created automatically if you run the `UpdateConfiguration.ps1`-
 > If you don not want to validate the scripts and config you can disable them through the script and configuration
 
 ```XML
+<?xml version="1.0" encoding="utf-8"?>
 <xml>
 	<config>
 		<validateChecksums>true</validateChecksums><!-- if true prgram will validate that config has not been changed using checksum in HKLM:\SOFTWARE\CineBank\ConfigCksm -->
@@ -34,6 +35,11 @@ The file will be created automatically if you run the `UpdateConfiguration.ps1`-
 	<checksums>
 		<!-- contains checksums of powershell skripts used by the program to play files - program will check their integrity during start -->
 		<!-- as the checksum of the config itself will be validated these checksums could not have been modified without administrative rights on your system -->
+		<Video1></Video1> <!-- each node contains one checksum - auto generated! -->
+		<Video2></Video2>
+		<DVDPlayer></DVDPlayer>
+		<BRPlayer></BRPlayer>
+		<AudioPlayer></AudioPlayer>
 	</checksums>
 </xml>
 ```
