@@ -48,6 +48,10 @@ namespace CineBank
             // set Format
         }
 
+        /// <summary>
+        /// Constructor to create a new Movie-Object. Will resolve connections to other tables.
+        /// </summary>
+        /// <param name="id">Database Id of the object. Required to search for foreign keys.</param>
         public Movie(long id)
         {
             Id = id;
@@ -86,6 +90,44 @@ namespace CineBank
         public static List<Movie> GetMovies(Database db, string filter = "")
         {
             List<Movie> movies = new List<Movie>();
+
+            // prepare sql statemet
+            string sql = "SELECT * FROM movies";
+            if (!String.IsNullOrWhiteSpace(filter))
+            {
+                // TODO extract filter options
+                throw new NotImplementedException("Usings filters to search for special movies is not implemented yet.");
+            }
+
+            // get data and check results
+            string[][] res = db.Query(sql + ";");
+            if (res == null || res.Length <= 1)
+            {
+                Console.WriteLine("INFO: No movies where found.");
+                return movies;
+            }
+
+            // loop over all results skipping the column names
+            for (int i = 1; i < res.Length; i++)
+            {
+                // create new movie object (FKs will be resolved by the constructor)
+                Movie tmp = new Movie(Convert.ToInt64(res[i][0]));
+
+                // add data (which does not require FKs)
+                tmp.Title = res[i][1];
+                tmp.Description = res[i][2];
+                tmp.Duration = res[i][3];
+                tmp.Type = (MovieType)Convert.ToInt32(res[i][4]);
+                tmp.Released = res[i][5];
+                tmp.Cast = res[i][6];
+                tmp.Director = res[i][7];
+                tmp.Score = res[i][8];
+                tmp.MaxResolution = res[i][9];
+
+                // add to list
+                movies.Add(tmp);
+            }
+
             return movies;
         }
     }

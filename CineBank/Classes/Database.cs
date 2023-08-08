@@ -64,6 +64,100 @@ namespace CineBank
         }
 
         /// <summary>
+        /// Insert data into a arbitrary table
+        /// </summary>
+        /// <param name="table">Name ofthe table to insert data into</param>
+        /// <param name="data">KeyValue-Pairs for each column. Key: Column Name, Value: Value to insert into column</param>
+        public void Insert(string table, Dictionary<string, string> data)
+        {
+            // extract column names and add parameters instead of values from dictionary (sql injection protection)
+            string columns = "";
+            string values = "";
+            foreach (var key in data)
+            {
+                columns += key.Key + ",";
+                values += "@" + key.Key + ",";
+            }
+
+            // prepare sql query
+            using var cmd = new SQLiteCommand(Connection);
+            cmd.CommandText = "INSERT INTO " + table + " (" + columns.Substring(0, columns.Length - 1) + ") VALUES (" + values.Substring(0, values.Length - 1) + ");";
+
+            // add values to the parameters
+            // looping two times is not very efficient, but avoids sql injections. the most tables won't have to many columns so that should be accaptable
+            foreach (var key in data)
+            {
+                cmd.Parameters.AddWithValue("@" + key.Key, key.Value);
+            }
+            cmd.Prepare();
+
+            // insert into db
+            cmd.ExecuteNonQuery();
+        }
+
+        /// <summary>
+        /// Get data from a arbitrary sql query 
+        /// </summary>
+        /// <param name="sql">SQL-Query to execute</param>
+        /// <returns>Array of string-Arrays. Inner array contains the values of each row and outer array the rows + at index 0 the colun names.</returns>
+        public string[][] Query(string sql)
+        {
+            List<string[]> data = new List<string[]>();
+
+            // get data
+            using var cmd = Connection.CreateCommand();
+            cmd.CommandText = sql;
+            using (var reader = cmd.ExecuteReader())
+            {
+                // get column names
+                List<string> columnNames = new List<string>();
+                for (int i = 0; i < reader.FieldCount; i++)
+                {
+                    columnNames.Add(reader.GetName(i));
+                }
+                data.Add(columnNames.ToArray());
+
+                // check no rows found
+                if (!reader.HasRows) return null;
+
+                // get rows
+                while (reader.Read())
+                {
+                    List<string> row = new List<string>();
+                    for (int i = 0; i < reader.FieldCount; i++)
+                    {
+                        row.Add(reader[i].ToString());
+                    }
+                    data.Add(row.ToArray());
+                }
+            }
+
+            // return result
+            return data.ToArray();
+        }
+
+        /// <summary>
+        /// Build a SQL-statement with escapeing the inputted values
+        /// </summary>
+        /// <param name="sql">SQL statement with parameters instead of the real data (e. g. 'SELECT * FROM movies WHERE Id=@Id')</param>
+        /// <param name="data">KeyValue-Pairs representing the data that should be inserted into the query safely. Keys must match the parameter-name in sql-parameter (e.g. {"@Id", "15"})</param>
+        /// <returns>SQL-CommandText with securly inserted data</returns>
+        public string PrepareSecureSQLStatement(string sql, Dictionary<string, string> data)
+        {
+            using var cmd = new SQLiteCommand(Connection);
+            cmd.CommandText = sql;
+
+            // insert data securely
+            foreach (var key in data)
+            {
+                cmd.Parameters.AddWithValue(key.Key, key.Value);
+            }
+            cmd.Prepare();
+
+            return cmd.CommandText;
+        }
+
+        /// <summary>
         /// Check if all entries in the file-table have an absolute path assigned
         /// </summary>
         /// <returns>true if all file entries have a absolute path</returns>

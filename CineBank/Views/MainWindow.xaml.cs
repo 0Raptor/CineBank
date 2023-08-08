@@ -236,7 +236,8 @@ namespace CineBank
             // extract selected object
             Movie mov = lbMovies.SelectedItem as Movie;
             // display object in preview
-            imgCoverPath.Source = new BitmapImage(new Uri(mov.CoverPath));
+            if (!String.IsNullOrWhiteSpace(mov.CoverPath))
+                imgCoverPath.Source = new BitmapImage(new Uri(mov.CoverPath));
             tbTitle.Text = mov.Title;
             tbDescription.Text = mov.Description;
             tbType.Text = Enum.GetName(typeof(Movie.MovieType), mov.Type);
