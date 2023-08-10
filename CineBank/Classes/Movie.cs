@@ -11,7 +11,7 @@ namespace CineBank
     /// </summary>
     public class Movie
     {
-        public long Id { get; set; }
+        public long Id { get; private set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public string CoverPath { get; private set; }
@@ -30,33 +30,149 @@ namespace CineBank
         public LinkedFile[] Files { get; private set; }
 
         /// <summary>
-        /// Solve m:n foreign key to e.g. obtain linked files from other db tables.
-        /// </summary>
-        /// <param name="id">Primary key (databse) of the entry.</param>
-        private void SolveForeignKeys(long id)
-        {
-            // get genres
-
-            // get languages, subtitles, etc.
-
-            // check if absolute path is used or obtain basedir
-
-            // get cover and set CoverPath
-
-            // get media files and set Files
-
-            // set Format
-        }
-
-        /// <summary>
         /// Constructor to create a new Movie-Object. Will resolve connections to other tables.
         /// </summary>
-        /// <param name="id">Database Id of the object. Required to search for foreign keys.</param>
+        /// <param name="id">Database Id of the object. Required to search for foreign keys. -1 when crating a new object that is not yet stored in the database.</param>
         public Movie(long id)
         {
             Id = id;
+        }
 
-            SolveForeignKeys(id);
+        /// <summary>
+        /// Solve m:n foreign key to e.g. obtain linked files from other db tables.
+        /// </summary>
+        /// <param name="id">Primary key (databse) of the entry.</param>
+        public void SolveForeignKeys(Database db)
+        {
+            // get genres
+            string[][] res = db.Query("SELECT g.Name FROM genres g, movies m, movies2genres mg WHERE m.Id = " + Id + " AND m.Id = mg.Movie AND mg.Genre = g.Id;");
+            if (res.Length < 2) // validate items where found
+                Console.WriteLine("WARNING: Movie: Failed to get genres from movie with ID " + Id);
+            else
+            {
+                Genre = "";
+                for (int i = 1; i < res.Length; i++) // add each genre name to the list
+                {
+                    Genre += res[i][0] + ", ";
+                }
+                Genre = Genre.Substring(0, Genre.Length - 2); // remove tailing ", "
+            }
+
+            // get languages
+            res = db.Query("SELECT l.Name FROM languages l, movies m, movies2languages ml WHERE ml.Type = \"L\" AND m.Id = " + Id + " AND m.Id = ml.Movie AND ml.Language = l.Id;");
+            if (res.Length < 2) // validate items where found
+                Console.WriteLine("WARNING: Movie: Failed to get spoken languages from movie with ID " + Id);
+            else
+            {
+                Languages = "";
+                for (int i = 1; i < res.Length; i++) // add each language name to the list
+                {
+                    Languages += res[i][0] + ", ";
+                }
+                Languages = Languages.Substring(0, Languages.Length - 2); // remove tailing ", "
+            }
+
+            // get subtitles
+            res = db.Query("SELECT l.Name FROM languages l, movies m, movies2languages ml WHERE ml.Type = \"S\" AND m.Id = " + Id + " AND m.Id = ml.Movie AND ml.Language = l.Id;");
+            if (res.Length < 2) // validate items where found
+                Console.WriteLine("WARNING: Movie: Failed to get subtitles from movie with ID " + Id);
+            else
+            {
+                Subtitles = "";
+                for (int i = 1; i < res.Length; i++) // add each language name to the list
+                {
+                    Subtitles += res[i][0] + ", ";
+                }
+                Subtitles = Subtitles.Substring(0, Subtitles.Length - 2); // remove tailing ", "
+            }
+
+            // get audio deskription
+            res = db.Query("SELECT l.Name FROM languages l, movies m, movies2languages ml WHERE ml.Type = \"A\" AND m.Id = " + Id + " AND m.Id = ml.Movie AND ml.Language = l.Id;");
+            if (res.Length < 2) // validate items where found
+                Console.WriteLine("WARNING: Movie: Failed to get audio deskrition languages from movie with ID " + Id);
+            else
+            {
+                AudioDescription = "";
+                for (int i = 1; i < res.Length; i++) // add each language name to the list
+                {
+                    AudioDescription += res[i][0] + ", ";
+                }
+                AudioDescription = AudioDescription.Substring(0, AudioDescription.Length - 2); // remove tailing ", "
+            }
+
+            // check if absolute path is used or obtain basedir
+            string baseDir = ""; // empty string so can be safely added before each filepath even if not required
+            if (!String.IsNullOrWhiteSpace(db.Config.BaseDir)) // if required value will be inserted here
+                baseDir = db.Config.BaseDir;
+
+            // get cover and set CoverPath
+            res = db.Query("SELECT Path FROM files WHERE Id = " + Id + ";");
+            if (res.Length < 2) // validate items where found
+                Console.WriteLine("WARNING: Movie: Failed to get cover from movie with ID " + Id);
+            else
+            {
+                if (res[1].Length == 1) // check column was found
+                {
+                    CoverPath = baseDir + res[1][0];
+                }
+            }
+
+            // get media files and set Files
+            res = db.Query("SELECT * FROM files WHERE Movie = " + Id + " AND Open != " + (int)LinkedFile.OpenWith.None + ";");
+            if (res.Length < 2) // validate items where found
+                Console.WriteLine("WARNING: Movie: Failed to get linked files from movie with ID " + Id);
+            else
+            {
+                List<LinkedFile> files = new List<LinkedFile>();
+                for (int i = 1; i < res.Length; i++) // add each linked file as new object to the list
+                {
+                    files.Add(new LinkedFile(Convert.ToInt64(res[i][0]), (LinkedFile.FileType)Convert.ToInt32(res[i][2]),
+                        (LinkedFile.OpenWith)Convert.ToInt32(res[i][3]), baseDir + res[i][4]));
+                }
+                Files = files.ToArray();
+            }
+
+            // set Format
+            foreach (var file in Files)
+            {
+                string format = "";
+                switch (file.Type) // get the name of the format based on file type and method used to open it
+                {
+                    case LinkedFile.FileType.Image:
+                        format += "Image File, ";
+                        break;
+                    case LinkedFile.FileType.Audio:
+                        format += "Audio File, ";
+                        break;
+                    case LinkedFile.FileType.ISO:
+                        if (file.Open == LinkedFile.OpenWith.DVDPlayer)
+                            format += "DVD ISO, ";
+                        else if (file.Open == LinkedFile.OpenWith.BRPlayer)
+                            format += "Blu-ray ISO, ";
+                        else
+                            format += "ISO, ";
+                        break;
+                    case LinkedFile.FileType.DVDFolder:
+                        format += "DVD Folder, ";
+                        break;
+                    case LinkedFile.FileType.BRFolder:
+                        format += "Blu-ray Folder, ";
+                        break;
+                    case LinkedFile.FileType.AVCHDFolder:
+                        format += "AVCHD Folder, ";
+                        break;
+                    case LinkedFile.FileType.Video:
+                        if (file.Open == LinkedFile.OpenWith.Video1)
+                            format += "Video File (Typ 1), ";
+                        else if (file.Open == LinkedFile.OpenWith.Video2)
+                            format += "Video File (Typ 2), ";
+                        else if (file.Open == LinkedFile.OpenWith.Undefined)
+                            format += "Unknown Video File, ";
+                        break;
+                }
+                format = format.Substring(0, format.Length - 2);
+                Format = format;
+            }
         }
 
         /// <summary>
@@ -124,6 +240,9 @@ namespace CineBank
                 tmp.Score = res[i][8];
                 tmp.MaxResolution = res[i][9];
 
+                // resolve foreign keys
+                tmp.SolveForeignKeys(db);
+
                 // add to list
                 movies.Add(tmp);
             }
@@ -141,6 +260,14 @@ namespace CineBank
         public FileType Type { get; set; }
         public OpenWith Open { get; set; }
         public string Path { get; set; }
+
+        public LinkedFile(long id, FileType type, OpenWith open, string path)
+        {
+            Id = id;
+            Type = type;
+            Open = open;
+            Path = path;
+        }
 
         /// <summary>
         /// Names of different types the file can be. May be required to play file

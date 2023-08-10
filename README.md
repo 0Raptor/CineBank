@@ -40,6 +40,7 @@ The file will be created automatically if you run the `UpdateConfiguration.ps1`-
 		<DVDPlayer></DVDPlayer>
 		<BRPlayer></BRPlayer>
 		<AudioPlayer></AudioPlayer>
+		<Setup></Setup>
 	</checksums>
 </xml>
 ```

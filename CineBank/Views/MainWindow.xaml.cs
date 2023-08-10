@@ -32,7 +32,8 @@ namespace CineBank
             { "Video2", "Scripts/VideoPlayer2.ps1" },
             { "DVDPlayer", "Scripts/DVDPlayer.ps1" },
             { "BRPlayer", "Scripts/BRPlayer.ps1" },
-            { "AudioPlayer", "Scripts/AudioPlayer.ps1" }
+            { "AudioPlayer", "Scripts/AudioPlayer.ps1" },
+            { "Setup", "UpdateConfiguration.ps1" }
         };
 
         string workingDir = "";

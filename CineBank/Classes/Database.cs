@@ -56,7 +56,7 @@ namespace CineBank
                         res.Add(reader.GetString(1), reader.GetString(2));
                     }
 
-                    Config = new DatabaseConfig(res["version"], res["baseDir"]);
+                    Config = new DatabaseConfig(res["baseDir"], res["version"]);
                 }
             }
 
