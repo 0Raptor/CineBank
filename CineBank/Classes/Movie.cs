@@ -27,15 +27,75 @@ namespace CineBank
         public string AudioDescription { get; private set; }
         public string MaxResolution { get; set; }
         public string Format { get; private set; }
+        public string Age { get; private set; }
+        public string Notes { get; private set; }
         public LinkedFile[] Files { get; private set; }
 
+
         /// <summary>
-        /// Constructor to create a new Movie-Object. Will resolve connections to other tables.
+        /// Constructor to create a new Movie-Object. This object is not represented in the database unless saved.
+        /// </summary>
+        public Movie()
+        {
+
+        }
+
+        /// <summary>
+        /// Constructor to create a Movie-Object that is already represented in the database. obj.SolveForeignKeys() should be called afterwards to get information that are linked via foreign keys.
         /// </summary>
         /// <param name="id">Database Id of the object. Required to search for foreign keys. -1 when crating a new object that is not yet stored in the database.</param>
         public Movie(long id)
         {
             Id = id;
+        }
+
+        /// <summary>
+        /// Constructor to create a new movie object and set all parameters. Private so it can only be used internal e.g. for deep copy.
+        /// </summary>
+        private Movie(long id, string title, string description, string coverPath, string genre, string duration, MovieType type,
+            string released, string cast, string director, string score, string languages, string subtitles, string audioDescripton,
+            string maxResolution, string format, string age, string notes, LinkedFile[] files)
+        {
+            Id = id;
+            Title = title;
+            Description = description;
+            CoverPath = coverPath;
+            Genre = genre;
+            Duration = duration;
+            Type = type;
+            Released = released;
+            Cast = cast;
+            Director = director;
+            Score = score;
+            Languages = languages;
+            Subtitles = subtitles;
+            AudioDescription = audioDescripton;
+            MaxResolution = maxResolution;
+            Format = format;
+            Age = age;
+            Notes = notes;
+            Files = files;
+        }
+
+        /// <summary>
+        /// Create a DeepCopy of the current object and return it
+        /// </summary>
+        /// <returns>Return copy of the current object that can be modified without changing the original</returns>
+        public Movie DeepCopy()
+        {
+            // copy linked files
+            List<LinkedFile> files = new List<LinkedFile>();
+            foreach (var file in Files)
+            {
+                files.Add(new LinkedFile(file.Id, file.Type, file.Open, file.Path));
+            }
+
+            // copy object
+            Movie deepcopy = new Movie(Id, Title, Description, CoverPath, Genre, Duration, Type, Released, Cast, Director, Score,
+                Languages, Subtitles, AudioDescription, MaxResolution, Format, Age, Notes, files.ToArray());
+
+            // return
+            return deepcopy;
         }
 
         /// <summary>
@@ -178,15 +238,56 @@ namespace CineBank
         /// <summary>
         /// Updates the entry of this object in the database.
         /// </summary>
-        public void UpdateInDB()
+        /// <param name="db">Database to store information in</param>
+        public void UpdateInDB(Database db)
         {
+            if (Id == default(long))
+            {
+                // new entry --> insert into db
+                string res = db.Insert("movies", new Dictionary<string, string> {
+                    {"Title", Title},
+                    {"Description", Description},
+                    {"Duration", Duration},
+                    {"Type", ((int)Type).ToString()},
+                    {"Released", Released},
+                    {"Cast", Cast},
+                    {"Director", Director},
+                    {"Score", Score},
+                    {"MaxResolution", MaxResolution},
+                    {"Age", Age},
+                    {"Notes", Notes}
+                });
 
+                // store id of new object
+                if (res != null)
+                {
+                    Id = Convert.ToInt64(res);
+                }
+            }
+            else
+            {
+                // exisitng entry --> update
+                db.Update("movies", "Id", Id.ToString(), new Dictionary<string, string> {
+                    {"Title", Title},
+                    {"Description", Description},
+                    {"Duration", Duration},
+                    {"Type", ((int)Type).ToString()},
+                    {"Released", Released},
+                    {"Cast", Cast},
+                    {"Director", Director},
+                    {"Score", Score},
+                    {"MaxResolution", MaxResolution},
+                    {"Age", Age},
+                    {"Notes", Notes}
+                });
+            }
         }
 
         /// <summary>
         /// Removes the item from the database
         /// </summary>
-        public void Delete()
+        /// <param name="db">Database to remove information from</param>
+        public void Delete(Database db)
         {
 
         }
@@ -239,6 +340,8 @@ namespace CineBank
                 tmp.Director = res[i][7];
                 tmp.Score = res[i][8];
                 tmp.MaxResolution = res[i][9];
+                tmp.Age = res[i][10];
+                tmp.Notes = res[i][11];
 
                 // resolve foreign keys
                 tmp.SolveForeignKeys(db);
@@ -249,53 +352,80 @@ namespace CineBank
 
             return movies;
         }
-    }
 
-    /// <summary>
-    /// Class that represents files and their properties that are linked to a movie in the database
-    /// </summary>
-    public class LinkedFile
-    {
-        public long Id { get; set; }
-        public FileType Type { get; set; }
-        public OpenWith Open { get; set; }
-        public string Path { get; set; }
+        #region override operators
+        // https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/how-to-define-value-equality-for-a-type
+        public override bool Equals(object obj) => this.Equals(obj as Movie);
 
-        public LinkedFile(long id, FileType type, OpenWith open, string path)
+        public bool Equals(Movie o)
         {
-            Id = id;
-            Type = type;
-            Open = open;
-            Path = path;
+            if (o is null)
+            {
+                return false;
+            }
+
+            // Optimization for a common success case.
+            if (Object.ReferenceEquals(this, o))
+            {
+                return true;
+            }
+
+            // If run-time types are not exactly the same, return false.
+            if (this.GetType() != o.GetType())
+            {
+                return false;
+            }
+
+            // Return true if the fields match.
+            // Note that the base class is not invoked because it is
+            // System.Object, which defines Equals as reference equality.
+
+            // compare elements in Files-Array
+            bool filesMatch = true;
+            if (Files.Length != o.Files.Length)
+            {
+                filesMatch = false;
+            }
+            else
+            {
+                for (int i = 0; i < Files.Length; i++)
+                {
+                    if (Files[i].Id != o.Files[i].Id || Files[i].Type != o.Files[i].Type ||
+                        Files[i].Open != o.Files[i].Open || Files[i].Path != o.Files[i].Path)
+                    {
+                        filesMatch = false;
+                        break;
+                    }
+                }
+            }
+
+            // compare other variables and return
+            return (Title == o.Title) && (Description == o.Description) && (Description == o.Description) &&
+                CoverPath == o.CoverPath && Genre == o.Genre && Duration == o.Duration && Type == o.Type &&
+                Released == o.Released && Cast == o.Cast && Director == o.Director && Score == o.Score &&
+                Languages == o.Languages && Subtitles == o.Subtitles && AudioDescription == o.AudioDescription &&
+                MaxResolution == o.MaxResolution && Format == o.Format && Age == o.Age && Notes == o.Notes &&
+                filesMatch;
         }
 
-        /// <summary>
-        /// Names of different types the file can be. May be required to play file
-        /// </summary>
-        public enum FileType : ushort
+        public static bool operator ==(Movie lhs, Movie rhs)
         {
-            Generic = 0,
-            Image = 1,
-            Audio = 2,
-            Video = 3,
-            ISO = 4,
-            DVDFolder = 5,
-            AVCHDFolder = 6,
-            BRFolder = 7
+            if (lhs is null)
+            {
+                if (rhs is null)
+                {
+                    return true;
+                }
+
+                // Only the left side is null.
+                return false;
+            }
+            // Equals handles case of null on right side.
+            // And compares content
+            return lhs.Equals(rhs);
         }
 
-        /// <summary>
-        /// Names of tools the file can be opened with. Required to play file.
-        /// </summary>
-        public enum OpenWith : ushort
-        {
-            Undefined = 0,
-            None = 1,
-            Video1 = 2,
-            Video2 = 3,
-            DVDPlayer = 4,
-            BRPlayer = 5,
-            AudioPlayer = 6
-        }
+        public static bool operator !=(Movie lhs, Movie rhs) => !(lhs == rhs);
+        #endregion
     }
 }

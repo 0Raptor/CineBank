@@ -45,6 +45,13 @@ The file will be created automatically if you run the `UpdateConfiguration.ps1`-
 </xml>
 ```
 
+## Roadmap
+
+Ideas that might be implemented in the future:
+
+1. Implement additional DBMS through turning Database-class into a virtual class and creating derived classes for each DBMS.
+2. Store information about people (Cast, Director, Score) in own table.
+
 ## License
 
 This application is published undes GNU GNU GENERAL PUBLIC LICENSE Version 3 as refered in the LICENSE-File.

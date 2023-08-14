@@ -66,9 +66,10 @@ namespace CineBank
         /// <summary>
         /// Insert data into a arbitrary table
         /// </summary>
-        /// <param name="table">Name ofthe table to insert data into</param>
+        /// <param name="table">Name of the table to insert data into</param>
         /// <param name="data">KeyValue-Pairs for each column. Key: Column Name, Value: Value to insert into column</param>
-        public void Insert(string table, Dictionary<string, string> data)
+        /// <returns>Database primary key of the last created entry as string. Null in case of an problem.</returns>
+        public string Insert(string table, Dictionary<string, string> data)
         {
             // extract column names and add parameters instead of values from dictionary (sql injection protection)
             string columns = "";
@@ -92,6 +93,58 @@ namespace CineBank
             cmd.Prepare();
 
             // insert into db
+            cmd.ExecuteNonQuery();
+
+            // get Id of the created row
+            //string returnIdQuery = "SELECT last_insert_rowid()"; // default sqlite internal id
+            string returnIdQuery = "SELECT Id FROM " + table + " WHERE rowid = last_insert_rowid();"; // software specific id
+            cmd.CommandText = returnIdQuery;
+            cmd.Prepare();
+            using (var reader = cmd.ExecuteReader())
+            {
+                // check no rows found
+                if (!reader.HasRows) return null;
+
+                // get rows
+                while (reader.Read())
+                {
+                    return reader[0].ToString();
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Update data in a arbitrary table using a arbitary primray key
+        /// </summary>
+        /// <param name="table">Name ofthe table to update data in</param>
+        /// <param name="primaryKeyName">Name of the primary key to search for</param>
+        /// <param name="primaryKeyValue">Value of the primary key of the row to edit</param>
+        /// <param name="data">KeyValue-Pairs for each column. Key: Column Name, Value: Value to insert into column</param>
+        public void Update(string table, string primaryKeyName, string primaryKeyValue, Dictionary<string, string> data)
+        {
+            // extract column names and add parameters instead of values from dictionary (sql injection protection)
+            string fields = "";
+            foreach (var key in data)
+            {
+                fields += key.Key + " = ";
+                fields += "@" + key.Key + ", ";
+            }
+
+            // prepare sql query
+            using var cmd = new SQLiteCommand(Connection);
+            cmd.CommandText = "UPDATE " + table + " SET " + fields.Substring(0, fields.Length - 2) + " WHERE " + primaryKeyName + " = @" + primaryKeyName + ";";
+
+            // add values to the parameters
+            // looping two times is not very efficient, but avoids sql injections. the most tables won't have to many columns so that should be accaptable
+            cmd.Parameters.AddWithValue("@" + primaryKeyName, primaryKeyValue);
+            foreach (var key in data)
+            {
+                cmd.Parameters.AddWithValue("@" + key.Key, key.Value);
+            }
+            cmd.Prepare();
+
+            // update in db
             cmd.ExecuteNonQuery();
         }
 
@@ -199,7 +252,7 @@ namespace CineBank
             using var cmd = new SQLiteCommand(con);
 
             // add each table
-            cmd.CommandText = @"CREATE TABLE IF NOT EXISTS movies (Id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, Title TEXT (255) UNIQUE NOT NULL, Description TEXT NOT NULL, Duration TEXT (10) NOT NULL, Type INTEGER NOT NULL, Released TEXT (10), Cast TEXT, Director TEXT, Score TEXT, MaxResolution TEXT (10));";
+            cmd.CommandText = @"CREATE TABLE IF NOT EXISTS movies (Id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, Title TEXT (255) UNIQUE NOT NULL, Description TEXT NOT NULL, Duration TEXT (10) NOT NULL, Type INTEGER NOT NULL, Released TEXT (10), Cast TEXT, Director TEXT, Score TEXT, MaxResolution TEXT (10), Age TEXT (10), Notes TEXT);";
             cmd.ExecuteNonQuery();
 
             cmd.CommandText = @"CREATE TABLE IF NOT EXISTS files (Id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, Movie INTEGER REFERENCES movies (Id) ON DELETE CASCADE NOT NULL, Type INTEGER NOT NULL, Open INTEGER NOT NULL, Path TEXT NOT NULL UNIQUE);";

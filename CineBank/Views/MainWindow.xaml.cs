@@ -253,6 +253,8 @@ namespace CineBank
             tbAudioDesc.Text = mov.AudioDescription;
             tbResolution.Text = mov.MaxResolution;
             tbFormat.Text = mov.Format;
+            tbAge.Text = mov.Age;
+            tbNotes.Text = mov.Notes;
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
@@ -261,7 +263,8 @@ namespace CineBank
 
             if (e.Key == Key.F5) { MenuItem_Reload_Click(null, null); }
             if (e.Key == Key.F1) { MenuItem_Add_Click(null, null); }
-            if (e.Key == Key.F2) { MenuItem_Settings_Click(null, null); }
+            if (e.Key == Key.F2) { MenuItem_Edit_Click(null, null); }
+            if (e.Key == Key.F6) { MenuItem_Settings_Click(null, null); }
             if (e.Key == Key.Delete) { MenuItem_Delete_Click(null, null); }
         }
 
@@ -316,7 +319,7 @@ namespace CineBank
             Movie mov = lbMovies.SelectedItem as Movie;
             // delete object
             movies.Remove(mov);
-            mov.Delete();
+            mov.Delete(db);
         }
 
         private void MenuItem_Reload_Click(object sender, RoutedEventArgs e)
@@ -330,9 +333,25 @@ namespace CineBank
 
         }
 
+        // display windows to add a new movie. pass null to constructor to ensure a new movie-object will be created.
         private void MenuItem_Add_Click(object sender, RoutedEventArgs e)
         {
+            Movie? m = null;
+            EntryWindow w = new EntryWindow(ref m, db);
+            w.Show();
+        }
 
+        // display windows to edit a new movie. pass object as reference to apply changes in main window instantanious.
+        private void MenuItem_Edit_Click(object sender, RoutedEventArgs e)
+        {
+            // check if selection is valid
+            if (lbMovies.SelectedItem == null)
+                return;
+            // extract selected object
+            Movie mov = lbMovies.SelectedItem as Movie;
+
+            EntryWindow w = new EntryWindow(ref mov, db);
+            w.Show();
         }
         #endregion
     }
