@@ -122,7 +122,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <Image Grid.Column="0" x:Name="imgCoverPath" Width="100" Height="200" Stretch="UniformToFill"></Image>
+                        <Image Grid.Column="0" x:Name="imgCoverPath" Width="136" Height="204" Stretch="UniformToFill"></Image>
                         <StackPanel Grid.Column="1" Orientation="Vertical">
                             <TextBlock x:Name="tbTitle" Margin="10,5" FontSize="24" FontWeight="Bold" HorizontalAlignment="Stretch" TextWrapping="Wrap"></TextBlock>
                             <TextBlock x:Name="tbDescription" Margin="10,5" FontSize="14" HorizontalAlignment="Stretch" TextWrapping="Wrap"></TextBlock>

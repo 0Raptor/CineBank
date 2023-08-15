@@ -36,9 +36,6 @@ namespace CineBank
                 movOld = editElement.DeepCopy();
                 // set reference to local var
                 mov = editElement;
-
-                // display current object information
-                // TO-DO
             }
             else
             {
@@ -47,9 +44,12 @@ namespace CineBank
                 movOld = mov.DeepCopy();
             }
 
+            // display current object information
+            //this.DataContext = mov;
             db = _db;
 
             InitializeComponent();
+            this.DataContext = mov;
         }
 
         #region Buttons
@@ -59,12 +59,12 @@ namespace CineBank
 
         }
 
-        private void btnAddConent_Click(object sender, RoutedEventArgs e)
+        private void btnAddContent_Click(object sender, RoutedEventArgs e)
         {
 
         }
 
-        private void btnRemoveConent_Click(object sender, RoutedEventArgs e)
+        private void btnRemoveContent_Click(object sender, RoutedEventArgs e)
         {
 
         }
@@ -76,12 +76,24 @@ namespace CineBank
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
+            if (mov != movOld) // check if data has been modified
+            {
+                mov.UpdateInDB(db); // store changes in db or create new element
+                movOld = mov.DeepCopy(); // update last status
 
+                MessageBox.Show("Successfully saved element.", "Save", MessageBoxButton.OK);
+            }
         }
 
         private void btnAbort_Click(object sender, RoutedEventArgs e)
         {
-
+            if (mov != movOld) // check if data has been modified
+            {
+                var res = MessageBox.Show("There are unsaved changes for this entry.\r\nDiscard changes and close window anyway?", "Discard Changes?", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (res == MessageBoxResult.No)
+                    return;
+            }
+            this.Close();
         }
         #endregion
     }

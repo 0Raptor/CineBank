@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CineBank"
         mc:Ignorable="d"
-        Title="CineBank - Edit" Height="680" Width="970">
+        Title="CineBank - Edit" Height="700" Width="970">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -55,49 +55,48 @@
                 </Grid.RowDefinitions>
 
                 <Label Grid.Column="0" Grid.Row="0" Content="Title" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" Grid.Row="0" x:Name="tbTitle" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" Grid.Row="0" x:Name="tbTitle" Text="{Binding Title}" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
 
                 <Label Grid.Column="0" Grid.Row="1" Content="Description" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" Grid.Row="1" x:Name="tbDesc" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="50" TextWrapping="Wrap"/>
+                <TextBox Grid.Column="1" Grid.Row="1" x:Name="tbDesc" Text="{Binding Description}" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="50" TextWrapping="Wrap"/>
 
-                <Label Grid.Column="0" Grid.Row="2" Content="Genres" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" Grid.Row="2" x:Name="tbGenres" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+                <Label Grid.Column="0" Grid.Row="2" Content="Genres *" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" Grid.Row="2" x:Name="tbGenres" Text="{Binding Genre}" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
 
                 <Label Grid.Column="0" Grid.Row="3" Content="Max Resolution" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" Grid.Row="3" x:Name="tbMaxRes" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" Grid.Row="3" x:Name="tbMaxRes" Text="{Binding MaxResolution}" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
 
                 <Label Grid.Column="0" Grid.Row="4" Content="Length" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" Grid.Row="4" x:Name="tbLength" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" Grid.Row="4" x:Name="tbLength" Text="{Binding Duration}" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
 
-                <Label Grid.Column="0" Grid.Row="5" Content="Format" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" Grid.Row="5" x:Name="tbFormat" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                <Label Grid.Column="0" Grid.Row="5" Content="Release" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" Grid.Row="5" x:Name="tbRelease" Text="{Binding Released}" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
 
-                <Label Grid.Column="0" Grid.Row="6" Content="Release" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" Grid.Row="6" x:Name="tbRelease" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                <Label Grid.Column="0" Grid.Row="6" Content="Languages *" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" Grid.Row="6" x:Name="tbLanguage" Text="{Binding Languages}" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
 
-                <Label Grid.Column="0" Grid.Row="7" Content="Languages" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" Grid.Row="7" x:Name="tbLanguage" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                <Label Grid.Column="0" Grid.Row="7" Content="Subtitles *" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" Grid.Row="7" x:Name="tbSubtitles" Text="{Binding Subtitles}" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
 
-                <Label Grid.Column="0" Grid.Row="8" Content="Subtitles" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" Grid.Row="8" x:Name="tbSubtitles" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                <Label Grid.Column="0" Grid.Row="8" Content="Audio Description *" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" Grid.Row="8" x:Name="tbAudioDesc" Text="{Binding AudioDescription}" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
 
-                <Label Grid.Column="0" Grid.Row="9" Content="Audio Description" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" Grid.Row="9" x:Name="tbAdvSubtitles" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                <Label Grid.Column="0" Grid.Row="9" Content="Cast" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" Grid.Row="9" x:Name="tbCast" Text="{Binding Cast}" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
 
-                <Label Grid.Column="0" Grid.Row="10" Content="Cast" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" Grid.Row="10" x:Name="tbCast" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                <Label Grid.Column="0" Grid.Row="10" Content="Director" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" Grid.Row="10" x:Name="tbDirector" Text="{Binding Director}" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
 
-                <Label Grid.Column="0" Grid.Row="11" Content="Director" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" Grid.Row="11" x:Name="tbDirector" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                <Label Grid.Column="0" Grid.Row="11" Content="Score" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" Grid.Row="11" x:Name="tbScore" Text="{Binding Score}" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
 
-                <Label Grid.Column="0" Grid.Row="12" Content="Score" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" Grid.Row="12" x:Name="tbScore" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                <Label Grid.Column="0" Grid.Row="12" Content="Age Rating" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" Grid.Row="12" x:Name="tbFSK" Text="{Binding Age}" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
 
-                <Label Grid.Column="0" Grid.Row="13" Content="Age Rating" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" Grid.Row="13" x:Name="tbFSK" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                <Label Grid.Column="0" Grid.Row="13" Content="Notes" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" Grid.Row="13" x:Name="tbMore" Text="{Binding Notes}" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="50" TextWrapping="Wrap"/>
 
-                <Label Grid.Column="0" Grid.Row="14" Content="Notes" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" Grid.Row="14" x:Name="tbMore" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="50" TextWrapping="Wrap"/>
+                <Label Grid.Column="1" Grid.Row="14" Content="* Comma seperated list" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             </Grid>
         </GroupBox>
 
@@ -119,15 +118,15 @@
 
                 <Label Grid.Row="0" Content="Content" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <TextBox Grid.Row="0" Grid.Column="1" x:Name="tbImportDVD" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="40"/>
-                <Button Grid.Row="0" Grid.Column="2" Content="+" Width="20" Height="20"  HorizontalAlignment="Center" VerticalAlignment="Center" Click="btnAddConent_Click"/>
-                <Button Grid.Row="0" Grid.Column="3" Content="-" Width="20" Height="20"  HorizontalAlignment="Center" VerticalAlignment="Center" Click="btnRemoveConent_Click"/>
+                <Button Grid.Row="0" Grid.Column="2" Content="+" Width="20" Height="20"  HorizontalAlignment="Center" VerticalAlignment="Center" Click="btnAddContent_Click"/>
+                <Button Grid.Row="0" Grid.Column="3" Content="-" Width="20" Height="20"  HorizontalAlignment="Center" VerticalAlignment="Center" Click="btnRemoveContent_Click"/>
 
                 <Label Grid.Row="2" Content=" Cover&#x0a;Graphic" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBox Grid.Row="2" Grid.Column="1" x:Name="tbImage" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="2" Grid.Column="1" x:Name="tbImage" Text="{Binding CoverPath}" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
                 <Button Grid.Row="2" Grid.Column="3" Content="..." Width="20" Height="20"  HorizontalAlignment="Center" VerticalAlignment="Center" Click="btnSelectCover_Click"/>
             </Grid>
         </GroupBox>
         <Button x:Name="btnImport" Content="Save" HorizontalAlignment="Center" Margin="90,10,0,0" Grid.Row="3" VerticalAlignment="Top" Width="75" Click="btnSave_Click"/>
-        <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Center" Margin="0,10,90,0" Grid.Row="3" VerticalAlignment="Top" Width="76" Click="btnAbort_Click"/>
+        <Button x:Name="btnCancel" Content="Close" HorizontalAlignment="Center" Margin="0,10,90,0" Grid.Row="3" VerticalAlignment="Top" Width="76" Click="btnAbort_Click"/>
     </Grid>
 </Window>

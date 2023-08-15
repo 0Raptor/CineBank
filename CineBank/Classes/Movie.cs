@@ -14,21 +14,21 @@ namespace CineBank
         public long Id { get; private set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public string CoverPath { get; private set; }
-        public string Genre { get; private set; }
+        public string CoverPath { get; set; } // private set
+        public string Genre { get; set; } // private set
         public string Duration { get; set; } // screentime in h:mm:ss OR number of episodes
         public MovieType Type { get; set; }
         public string Released { get; set; }
         public string Cast { get; set; }
         public string Director { get; set; }
         public string Score { get; set; }
-        public string Languages { get; private set; }
-        public string Subtitles { get; private set; }
-        public string AudioDescription { get; private set; }
+        public string Languages { get; set; } // private set
+        public string Subtitles { get; set; } // private set
+        public string AudioDescription { get; set; } // private set
         public string MaxResolution { get; set; }
         public string Format { get; private set; }
-        public string Age { get; private set; }
-        public string Notes { get; private set; }
+        public string Age { get; set; } // private set
+        public string Notes { get; set; } // private set
         public LinkedFile[] Files { get; private set; }
 
 
@@ -37,7 +37,25 @@ namespace CineBank
         /// </summary>
         public Movie()
         {
-
+            Id = default(long);
+            Title = "";
+            Description = "";
+            CoverPath = "";
+            Genre = "";
+            Duration = "";
+            Type = MovieType.Movie;
+            Released = "";
+            Cast = "";
+            Director = "";
+            Score = "";
+            Languages = "";
+            Subtitles = "";
+            AudioDescription = "";
+            MaxResolution = "";
+            Format = "";
+            Age = "";
+            Notes = "";
+            Files = new LinkedFile[] { };
         }
 
         /// <summary>
@@ -47,6 +65,24 @@ namespace CineBank
         public Movie(long id)
         {
             Id = id;
+            Title = "";
+            Description = "";
+            CoverPath = "";
+            Genre = "";
+            Duration = "";
+            Type = MovieType.Movie;
+            Released = "";
+            Cast = "";
+            Director = "";
+            Score = "";
+            Languages = "";
+            Subtitles = "";
+            AudioDescription = "";
+            MaxResolution = "";
+            Format = "";
+            Age = "";
+            Notes = "";
+            Files = new LinkedFile[] {};
         }
 
         /// <summary>
@@ -85,9 +121,12 @@ namespace CineBank
         {
             // copy linked files
             List<LinkedFile> files = new List<LinkedFile>();
-            foreach (var file in Files)
+            if (Files != null)
             {
-                files.Add(new LinkedFile(file.Id, file.Type, file.Open, file.Path));
+                foreach (var file in Files)
+                {
+                    files.Add(new LinkedFile(file.Id, file.Type, file.Open, file.Path));
+                }
             }
 
             // copy object
