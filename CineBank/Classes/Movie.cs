@@ -14,22 +14,22 @@ namespace CineBank
         public long Id { get; private set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public string CoverPath { get; set; } // private set
-        public string Genre { get; set; } // private set
+        public string CoverPath { get; set; }
+        public string Genre { get; set; }
         public string Duration { get; set; } // screentime in h:mm:ss OR number of episodes
         public MovieType Type { get; set; }
         public string Released { get; set; }
         public string Cast { get; set; }
         public string Director { get; set; }
         public string Score { get; set; }
-        public string Languages { get; set; } // private set
-        public string Subtitles { get; set; } // private set
-        public string AudioDescription { get; set; } // private set
+        public string Languages { get; set; }
+        public string Subtitles { get; set; }
+        public string AudioDescription { get; set; }
         public string MaxResolution { get; set; }
         public string Format { get; private set; }
-        public string Age { get; set; } // private set
-        public string Notes { get; set; } // private set
-        public LinkedFile[] Files { get; private set; }
+        public string Age { get; set; }
+        public string Notes { get; set; }
+        public LinkedFile[] Files { get; set; }
 
 
         /// <summary>
@@ -138,6 +138,33 @@ namespace CineBank
         }
 
         /// <summary>
+        /// Set all members to the values of a reference object.
+        /// </summary>
+        /// <param name="src">Reference object to copy the members values from</param>
+        public void SetMembers(Movie src)
+        {
+            Id = src.Id;
+            Title = src.Title;
+            Description = src.Description;
+            CoverPath = src.CoverPath;
+            Genre = src.Genre;
+            Duration = src.Duration;
+            Type = src.Type;
+            Released = src.Released;
+            Cast = src.Cast;
+            Director = src.Director;
+            Score = src.Score;
+            Languages = src.Languages;
+            Subtitles = src.Subtitles;
+            AudioDescription = src.AudioDescription;
+            MaxResolution = src.MaxResolution;
+            Format = src.Format;
+            Age = src.Age;
+            Notes = src.Notes;
+            Files = src.Files;
+        }
+
+        /// <summary>
         /// Solve m:n foreign key to e.g. obtain linked files from other db tables.
         /// </summary>
         /// <param name="id">Primary key (databse) of the entry.</param>
@@ -145,7 +172,7 @@ namespace CineBank
         {
             // get genres
             string[][] res = db.Query("SELECT g.Name FROM genres g, movies m, movies2genres mg WHERE m.Id = " + Id + " AND m.Id = mg.Movie AND mg.Genre = g.Id;");
-            if (res.Length < 2) // validate items where found
+            if (res == null || res.Length < 2) // validate items where found
                 Console.WriteLine("WARNING: Movie: Failed to get genres from movie with ID " + Id);
             else
             {
@@ -159,7 +186,7 @@ namespace CineBank
 
             // get languages
             res = db.Query("SELECT l.Name FROM languages l, movies m, movies2languages ml WHERE ml.Type = \"L\" AND m.Id = " + Id + " AND m.Id = ml.Movie AND ml.Language = l.Id;");
-            if (res.Length < 2) // validate items where found
+            if (res == null || res.Length < 2) // validate items where found
                 Console.WriteLine("WARNING: Movie: Failed to get spoken languages from movie with ID " + Id);
             else
             {
@@ -173,7 +200,7 @@ namespace CineBank
 
             // get subtitles
             res = db.Query("SELECT l.Name FROM languages l, movies m, movies2languages ml WHERE ml.Type = \"S\" AND m.Id = " + Id + " AND m.Id = ml.Movie AND ml.Language = l.Id;");
-            if (res.Length < 2) // validate items where found
+            if (res == null || res.Length < 2) // validate items where found
                 Console.WriteLine("WARNING: Movie: Failed to get subtitles from movie with ID " + Id);
             else
             {
@@ -187,7 +214,7 @@ namespace CineBank
 
             // get audio deskription
             res = db.Query("SELECT l.Name FROM languages l, movies m, movies2languages ml WHERE ml.Type = \"A\" AND m.Id = " + Id + " AND m.Id = ml.Movie AND ml.Language = l.Id;");
-            if (res.Length < 2) // validate items where found
+            if (res == null || res.Length < 2) // validate items where found
                 Console.WriteLine("WARNING: Movie: Failed to get audio deskrition languages from movie with ID " + Id);
             else
             {
@@ -206,7 +233,7 @@ namespace CineBank
 
             // get cover and set CoverPath
             res = db.Query("SELECT Path FROM files WHERE Id = " + Id + ";");
-            if (res.Length < 2) // validate items where found
+            if (res == null || res.Length < 2) // validate items where found
                 Console.WriteLine("WARNING: Movie: Failed to get cover from movie with ID " + Id);
             else
             {
@@ -218,7 +245,7 @@ namespace CineBank
 
             // get media files and set Files
             res = db.Query("SELECT * FROM files WHERE Movie = " + Id + " AND Open != " + (int)LinkedFile.OpenWith.None + ";");
-            if (res.Length < 2) // validate items where found
+            if (res == null || res.Length < 2) // validate items where found
                 Console.WriteLine("WARNING: Movie: Failed to get linked files from movie with ID " + Id);
             else
             {
@@ -280,6 +307,7 @@ namespace CineBank
         /// <param name="db">Database to store information in</param>
         public void UpdateInDB(Database db)
         {
+            // update main entry
             if (Id == default(long))
             {
                 // new entry --> insert into db
@@ -320,6 +348,54 @@ namespace CineBank
                     {"Notes", Notes}
                 });
             }
+
+            // update foreign keys
+            // languages
+            string[] languges = Languages.Split(',');
+            foreach (string lang in languges)
+            {
+                string query = "INSERT INTO movies2languages(Language, Movie, Type) VALUES((SELECT Id FROM languages WHERE Name = @lang), @Id, \"L\");";
+                query = db.PrepareSecureSQLStatement(query, new Dictionary<string, string>
+                {
+                    { "@lang", lang.Trim() }, { "Id", Id.ToString() }
+                });
+                db.Insert("movies2languages", query);
+            }
+            // subtitles
+            string[] subtitles = Subtitles.Split(',');
+            foreach (string lang in subtitles)
+            {
+                string query = "INSERT INTO movies2languages(Language, Movie, Type) VALUES((SELECT Id FROM languages WHERE Name = @lang), @Id, \"S\");";
+                query = db.PrepareSecureSQLStatement(query, new Dictionary<string, string>
+                {
+                    { "@lang", lang.Trim() }, { "Id", Id.ToString() }
+                });
+                db.Insert("movies2languages", query);
+            }
+            // audio description
+            string[] audioDesc = AudioDescription.Split(',');
+            foreach (string lang in audioDesc)
+            {
+                string query = "INSERT INTO movies2languages(Language, Movie, Type) VALUES((SELECT Id FROM languages WHERE Name = @lang), @Id, \"A\");";
+                query = db.PrepareSecureSQLStatement(query, new Dictionary<string, string>
+                {
+                    { "@lang", lang.Trim() }, { "Id", Id.ToString() }
+                });
+                db.Insert("movies2languages", query);
+            }
+            // genres
+            string[] genre = Genre.Split(',');
+            foreach (string g in genre)
+            {
+                string query = "INSERT INTO movies2genres(Genre, Movie) VALUES((SELECT Id FROM genres WHERE Name = @g), @Id);";
+                query = db.PrepareSecureSQLStatement(query, new Dictionary<string, string>
+                {
+                    { "@g", g.Trim() }, { "Id", Id.ToString() }
+                });
+                db.Insert("movies2genres", query);
+            }
+            // files
+            // format (based on files)
         }
 
         /// <summary>

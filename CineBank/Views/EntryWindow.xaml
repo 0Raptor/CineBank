@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CineBank"
         mc:Ignorable="d"
-        Title="CineBank - Edit" Height="700" Width="970">
+        Title="CineBank - Edit" Height="715" Width="970" MinHeight="715" MinWidth="400">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -37,6 +37,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -96,7 +97,11 @@
                 <Label Grid.Column="0" Grid.Row="13" Content="Notes" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <TextBox Grid.Column="1" Grid.Row="13" x:Name="tbMore" Text="{Binding Notes}" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="50" TextWrapping="Wrap"/>
 
-                <Label Grid.Column="1" Grid.Row="14" Content="* Comma seperated list" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <Label Grid.Column="0" Grid.Row="14" Content="Type" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <RadioButton Grid.Column="1" Grid.Row="14" x:Name="cbTypeMovie" Content="Movie" VerticalAlignment="Center" IsChecked="True" GroupName="rbGroup"/>
+                <RadioButton Grid.Column="1" Grid.Row="14" x:Name="cbTypeSeries" Content="Series" Margin="100,0,0,0" VerticalAlignment="Center" IsChecked="False" GroupName="rbGroup"/>
+                
+                <Label Grid.Column="1" Grid.Row="15" Content="* Comma seperated list" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             </Grid>
         </GroupBox>
 
@@ -117,7 +122,24 @@
                
 
                 <Label Grid.Row="0" Content="Content" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBox Grid.Row="0" Grid.Column="1" x:Name="tbImportDVD" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="40"/>
+                <ListBox Grid.Row="0" Grid.Column="1" x:Name="lbFiles" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="40">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{Binding Id}" Margin="5,0" HorizontalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Type}" Margin="5,0" HorizontalAlignment="Center"/>
+                                <TextBlock Grid.Column="2" Text="{Binding Open}" Margin="5,0" HorizontalAlignment="Center"/>
+                                <TextBlock Grid.Column="3" Text="{Binding Path}" Margin="5,0" HorizontalAlignment="Center"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
                 <Button Grid.Row="0" Grid.Column="2" Content="+" Width="20" Height="20"  HorizontalAlignment="Center" VerticalAlignment="Center" Click="btnAddContent_Click"/>
                 <Button Grid.Row="0" Grid.Column="3" Content="-" Width="20" Height="20"  HorizontalAlignment="Center" VerticalAlignment="Center" Click="btnRemoveContent_Click"/>
 

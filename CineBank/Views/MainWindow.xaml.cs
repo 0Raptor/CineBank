@@ -237,24 +237,47 @@ namespace CineBank
             // extract selected object
             Movie mov = lbMovies.SelectedItem as Movie;
             // display object in preview
-            if (!String.IsNullOrWhiteSpace(mov.CoverPath))
-                imgCoverPath.Source = new BitmapImage(new Uri(mov.CoverPath));
-            tbTitle.Text = mov.Title;
-            tbDescription.Text = mov.Description;
-            tbType.Text = Enum.GetName(typeof(Movie.MovieType), mov.Type);
-            tbGenre.Text = mov.Genre;
-            tbDuration.Text = mov.Duration;
-            tbRelease.Text = mov.Released;
-            tbCast.Text = mov.Cast;
-            tbDirector.Text = mov.Director;
-            tbScore.Text = mov.Score;
-            tbLanguages.Text = mov.Languages;
-            tbSubtitles.Text = mov.Subtitles;
-            tbAudioDesc.Text = mov.AudioDescription;
-            tbResolution.Text = mov.MaxResolution;
-            tbFormat.Text = mov.Format;
-            tbAge.Text = mov.Age;
-            tbNotes.Text = mov.Notes;
+            try
+            {
+                if (!String.IsNullOrWhiteSpace(mov.CoverPath))
+                    imgCoverPath.Source = new BitmapImage(new Uri(mov.CoverPath));
+                tbTitle.Text = mov.Title;
+                tbDescription.Text = mov.Description;
+                tbType.Text = Enum.GetName(typeof(Movie.MovieType), mov.Type);
+                tbGenre.Text = mov.Genre;
+                tbDuration.Text = mov.Duration;
+                tbRelease.Text = mov.Released;
+                tbCast.Text = mov.Cast;
+                tbDirector.Text = mov.Director;
+                tbScore.Text = mov.Score;
+                tbLanguages.Text = mov.Languages;
+                tbSubtitles.Text = mov.Subtitles;
+                tbAudioDesc.Text = mov.AudioDescription;
+                tbResolution.Text = mov.MaxResolution;
+                tbFormat.Text = mov.Format;
+                tbAge.Text = mov.Age;
+                tbNotes.Text = mov.Notes;
+            } catch
+            {
+                imgCoverPath.Source = null;
+                tbTitle.Text = "";
+                tbDescription.Text = "";
+                tbType.Text = "";
+                tbGenre.Text = "";
+                tbDuration.Text = "";
+                tbRelease.Text = "";
+                tbCast.Text = "";
+                tbDirector.Text = "";
+                tbScore.Text = "";
+                tbLanguages.Text = "";
+                tbSubtitles.Text = "";
+                tbAudioDesc.Text = "";
+                tbResolution.Text = "";
+                tbFormat.Text = "";
+                tbAge.Text = "";
+
+                tbNotes.Text = "WARNING: Failed to load data.";
+            }
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
@@ -319,6 +342,7 @@ namespace CineBank
             Movie mov = lbMovies.SelectedItem as Movie;
             // delete object
             movies.Remove(mov);
+            lbMovies.Items.Refresh();
             mov.Delete(db);
         }
 

@@ -115,6 +115,41 @@ namespace CineBank
         }
 
         /// <summary>
+        /// Insert data into a table using a supplied sql-query
+        /// </summary>
+        /// <param name="table">Name of the table to insert data into</param>
+        /// <param name="sql">sql-command to insert data. Consider using PrepareSecureSQLStatement() to avoid sql injections.</param>
+        /// <returns>Database primary key of the last created entry as string. Null in case of an problem.</returns>
+        public string Insert(string table, string sql)
+        {
+            // prepare sql query
+            using var cmd = new SQLiteCommand(Connection);
+            cmd.CommandText = sql;
+            cmd.Prepare();
+
+            // insert into db
+            cmd.ExecuteNonQuery();
+
+            // get Id of the created row
+            //string returnIdQuery = "SELECT last_insert_rowid()"; // default sqlite internal id
+            string returnIdQuery = "SELECT Id FROM " + table + " WHERE rowid = last_insert_rowid();"; // software specific id
+            cmd.CommandText = returnIdQuery;
+            cmd.Prepare();
+            using (var reader = cmd.ExecuteReader())
+            {
+                // check no rows found
+                if (!reader.HasRows) return null;
+
+                // get rows
+                while (reader.Read())
+                {
+                    return reader[0].ToString();
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Update data in a arbitrary table using a arbitary primray key
         /// </summary>
         /// <param name="table">Name ofthe table to update data in</param>
