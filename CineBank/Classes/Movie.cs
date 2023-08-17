@@ -114,6 +114,56 @@ namespace CineBank
         }
 
         /// <summary>
+        /// Update the string Format based on the file-objects in Files
+        /// </summary>
+        private void UpdateFormat()
+        {
+            string format = "";
+            foreach (var file in Files)
+            {
+                if (file.Open == LinkedFile.OpenWith.None) // skip unopenable files
+                    continue;
+
+                switch (file.Type) // get the name of the format based on file type and method used to open it
+                {
+                    case LinkedFile.FileType.Image:
+                        if (!format.Contains("Image File, ")) format += "Image File, ";
+                        break;
+                    case LinkedFile.FileType.Audio:
+                        if (!format.Contains("Audio File, ")) format += "Audio File, ";
+                        break;
+                    case LinkedFile.FileType.ISO:
+                        if (file.Open == LinkedFile.OpenWith.DVDPlayer)
+                            if (!format.Contains("DVD ISO, ")) format += "DVD ISO, ";
+                        if (file.Open == LinkedFile.OpenWith.BRPlayer)
+                            if (!format.Contains("Blu-ray ISO, ")) format += "Blu-ray ISO, ";
+                        else
+                            if (!format.Contains("ISO, ")) format += "ISO, ";
+                        break;
+                    case LinkedFile.FileType.DVDFolder:
+                        if (!format.Contains("DVD Folder, ")) format += "DVD Folder, ";
+                        break;
+                    case LinkedFile.FileType.BRFolder:
+                        if (!format.Contains("Blu-ray Folder, ")) format += "Blu -ray Folder, ";
+                        break;
+                    case LinkedFile.FileType.AVCHDFolder:
+                        if (!format.Contains("AVCHD Folder, ")) format += "AVCHD Folder, ";
+                        break;
+                    case LinkedFile.FileType.Video:
+                        if (file.Open == LinkedFile.OpenWith.Video1)
+                            if (!format.Contains("Video File (Typ 1), ")) format += "Video File (Typ 1), ";
+                        if (file.Open == LinkedFile.OpenWith.Video2)
+                            if (!format.Contains("Video File (Typ 2), ")) format += "Video File (Typ 2), ";
+                        if (file.Open == LinkedFile.OpenWith.Undefined)
+                            if (!format.Contains("Unknown Video File, ")) format += "Unknown Video File, ";
+                        break;
+                }
+            }
+            if (format.Length > 2) format = format.Substring(0, format.Length - 2);
+            Format = format;
+        }
+
+        /// <summary>
         /// Create a DeepCopy of the current object and return it
         /// </summary>
         /// <returns>Return copy of the current object that can be modified without changing the original</returns>
@@ -232,7 +282,7 @@ namespace CineBank
                 baseDir = db.Config.BaseDir;
 
             // get cover and set CoverPath
-            res = db.Query("SELECT Path FROM files WHERE Id = " + Id + ";");
+            res = db.Query("SELECT Path FROM files WHERE Id = " + Id + " AND Open = " + (int)LinkedFile.OpenWith.None + ";");
             if (res == null || res.Length < 2) // validate items where found
                 Console.WriteLine("WARNING: Movie: Failed to get cover from movie with ID " + Id);
             else
@@ -244,7 +294,7 @@ namespace CineBank
             }
 
             // get media files and set Files
-            res = db.Query("SELECT * FROM files WHERE Movie = " + Id + " AND Open != " + (int)LinkedFile.OpenWith.None + ";");
+            res = db.Query("SELECT * FROM files WHERE Movie = " + Id + ";");
             if (res == null || res.Length < 2) // validate items where found
                 Console.WriteLine("WARNING: Movie: Failed to get linked files from movie with ID " + Id);
             else
@@ -259,45 +309,36 @@ namespace CineBank
             }
 
             // set Format
-            foreach (var file in Files)
+            UpdateFormat();
+        }
+
+        /// <summary>
+        /// Delete m:n-connections
+        /// </summary>
+        /// <param name="db">Database to delete the connection from</param>
+        /// <param name="table">Select wich table to delete from (language, genre). When language is selected add (":L" for languagem, ":S" for subtitle and ":A" for audio description)</param>
+        /// <param name="name">Name of the language or genre to delete</param>
+        public void RemoveForeignKeys(Database db, string table, string name)
+        {
+            if (table.StartsWith("language"))
             {
-                string format = "";
-                switch (file.Type) // get the name of the format based on file type and method used to open it
+                // delete from movies2languages
+                string query = "DELETE FROM movies2languages WHERE Language = (SELECT Id FROM languages WHERE Name = @lang) AND Type = @type AND Movie = @id;";
+                query = db.PrepareSecureSQLStatement(query, new Dictionary<string, string>
                 {
-                    case LinkedFile.FileType.Image:
-                        format += "Image File, ";
-                        break;
-                    case LinkedFile.FileType.Audio:
-                        format += "Audio File, ";
-                        break;
-                    case LinkedFile.FileType.ISO:
-                        if (file.Open == LinkedFile.OpenWith.DVDPlayer)
-                            format += "DVD ISO, ";
-                        else if (file.Open == LinkedFile.OpenWith.BRPlayer)
-                            format += "Blu-ray ISO, ";
-                        else
-                            format += "ISO, ";
-                        break;
-                    case LinkedFile.FileType.DVDFolder:
-                        format += "DVD Folder, ";
-                        break;
-                    case LinkedFile.FileType.BRFolder:
-                        format += "Blu-ray Folder, ";
-                        break;
-                    case LinkedFile.FileType.AVCHDFolder:
-                        format += "AVCHD Folder, ";
-                        break;
-                    case LinkedFile.FileType.Video:
-                        if (file.Open == LinkedFile.OpenWith.Video1)
-                            format += "Video File (Typ 1), ";
-                        else if (file.Open == LinkedFile.OpenWith.Video2)
-                            format += "Video File (Typ 2), ";
-                        else if (file.Open == LinkedFile.OpenWith.Undefined)
-                            format += "Unknown Video File, ";
-                        break;
-                }
-                format = format.Substring(0, format.Length - 2);
-                Format = format;
+                    { "@lang", name.Trim() }, { "@type", table.Split(':')[1].Trim() }, { "@id", Id.ToString() }
+                });
+                db.Query(query);
+            }
+            else if (table.StartsWith("genre"))
+            {
+                // delete from movies2genres
+                string query = "DELETE FROM movies2genres WHERE Genre = (SELECT Id FROM genres WHERE Name = @g) AND Movie = @id;";
+                query = db.PrepareSecureSQLStatement(query, new Dictionary<string, string>
+                {
+                    { "@g", name.Trim() }, { "@id", Id.ToString() }
+                });
+                db.Query(query);
             }
         }
 
@@ -354,10 +395,19 @@ namespace CineBank
             string[] languges = Languages.Split(',');
             foreach (string lang in languges)
             {
-                string query = "INSERT INTO movies2languages(Language, Movie, Type) VALUES((SELECT Id FROM languages WHERE Name = @lang), @Id, \"L\");";
+                // make sure language is exisitng
+                string query = "INSERT OR IGNORE INTO languages(Name) VALUES(@lang);";
                 query = db.PrepareSecureSQLStatement(query, new Dictionary<string, string>
                 {
-                    { "@lang", lang.Trim() }, { "Id", Id.ToString() }
+                    { "@lang", lang.Trim() }
+                });
+                db.Insert("languages", query);
+
+                // add connection between language and movie
+                query = "INSERT OR IGNORE INTO movies2languages(Language, Movie, Type) VALUES((SELECT Id FROM languages WHERE Name = @lang), @id, \"L\");";
+                query = db.PrepareSecureSQLStatement(query, new Dictionary<string, string>
+                {
+                    { "@lang", lang.Trim() }, { "@id", Id.ToString() }
                 });
                 db.Insert("movies2languages", query);
             }
@@ -365,10 +415,19 @@ namespace CineBank
             string[] subtitles = Subtitles.Split(',');
             foreach (string lang in subtitles)
             {
-                string query = "INSERT INTO movies2languages(Language, Movie, Type) VALUES((SELECT Id FROM languages WHERE Name = @lang), @Id, \"S\");";
+                // make sure language is exisitng
+                string query = "INSERT OR IGNORE INTO languages(Name) VALUES(@lang);";
                 query = db.PrepareSecureSQLStatement(query, new Dictionary<string, string>
                 {
-                    { "@lang", lang.Trim() }, { "Id", Id.ToString() }
+                    { "@lang", lang.Trim() }
+                });
+                db.Insert("languages", query);
+
+                // add connection between language and movie
+                query = "INSERT OR IGNORE INTO movies2languages(Language, Movie, Type) VALUES((SELECT Id FROM languages WHERE Name = @lang), @id, \"S\");";
+                query = db.PrepareSecureSQLStatement(query, new Dictionary<string, string>
+                {
+                    { "@lang", lang.Trim() }, { "@id", Id.ToString() }
                 });
                 db.Insert("movies2languages", query);
             }
@@ -376,10 +435,19 @@ namespace CineBank
             string[] audioDesc = AudioDescription.Split(',');
             foreach (string lang in audioDesc)
             {
-                string query = "INSERT INTO movies2languages(Language, Movie, Type) VALUES((SELECT Id FROM languages WHERE Name = @lang), @Id, \"A\");";
+                // make sure language is exisitng
+                string query = "INSERT OR IGNORE INTO languages(Name) VALUES(@lang);";
                 query = db.PrepareSecureSQLStatement(query, new Dictionary<string, string>
                 {
-                    { "@lang", lang.Trim() }, { "Id", Id.ToString() }
+                    { "@lang", lang.Trim() }
+                });
+                db.Insert("languages", query);
+
+                // add connection between language and movie
+                query = "INSERT OR IGNORE INTO movies2languages(Language, Movie, Type) VALUES((SELECT Id FROM languages WHERE Name = @lang), @id, \"A\");";
+                query = db.PrepareSecureSQLStatement(query, new Dictionary<string, string>
+                {
+                    { "@lang", lang.Trim() }, { "@id", Id.ToString() }
                 });
                 db.Insert("movies2languages", query);
             }
@@ -387,15 +455,29 @@ namespace CineBank
             string[] genre = Genre.Split(',');
             foreach (string g in genre)
             {
-                string query = "INSERT INTO movies2genres(Genre, Movie) VALUES((SELECT Id FROM genres WHERE Name = @g), @Id);";
+                // make sure genre is exisitng
+                string query = "INSERT OR IGNORE INTO genres(Name) VALUES(@g);";
                 query = db.PrepareSecureSQLStatement(query, new Dictionary<string, string>
                 {
-                    { "@g", g.Trim() }, { "Id", Id.ToString() }
+                    { "@g", g.Trim() }
+                });
+                db.Insert("genres", query);
+
+                // add connection between genre and movie
+                query = "INSERT OR IGNORE INTO movies2genres(Genre, Movie) VALUES((SELECT Id FROM genres WHERE Name = @g), @id);";
+                query = db.PrepareSecureSQLStatement(query, new Dictionary<string, string>
+                {
+                    { "@g", g.Trim() }, { "@id", Id.ToString() }
                 });
                 db.Insert("movies2genres", query);
             }
             // files
+            foreach (LinkedFile lf in Files)
+            {
+                lf.UpdateInDB(db, Id);
+            }
             // format (based on files)
+            UpdateFormat();
         }
 
         /// <summary>

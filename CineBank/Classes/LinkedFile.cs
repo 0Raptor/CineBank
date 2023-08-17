@@ -54,7 +54,7 @@ namespace CineBank
             if (Id == default(long))
             {
                 // new entry --> insert into db
-                string res = db.Insert("movies", new Dictionary<string, string> {
+                string res = db.Insert("files", new Dictionary<string, string> {
                     {"Movie", linkToMovie.ToString()},
                     {"Type", ((int)Type).ToString()},
                     {"Open", ((int)Open).ToString()},
@@ -70,13 +70,22 @@ namespace CineBank
             else
             {
                 // exisitng entry --> update
-                db.Update("movies", "Id", Id.ToString(), new Dictionary<string, string> {
+                db.Update("files", "Id", Id.ToString(), new Dictionary<string, string> {
                     {"Movie", linkToMovie.ToString()},
                     {"Type", ((int)Type).ToString()},
                     {"Open", ((int)Open).ToString()},
                     {"Path", Path}
                 });
             }
+        }
+
+        /// <summary>
+        /// Removes the item from the database
+        /// </summary>
+        /// <param name="db">Database to remove information from</param>
+        public void Delete(Database db)
+        {
+
         }
 
         /// <summary>

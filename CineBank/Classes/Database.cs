@@ -26,6 +26,15 @@ namespace CineBank
             if (baseDir != "") Config.BaseDir = baseDir;
         }
 
+        /// <summary>
+        /// Destructor. Called when object is going to be removed.
+        /// </summary>
+        ~Database()
+        {
+            // disconnect from db
+            try { Connection.Dispose(); } catch { }
+        }
+
         private SQLiteConnection CreateConnection(string path)
         {
 
@@ -242,7 +251,14 @@ namespace CineBank
             }
             cmd.Prepare();
 
-            return cmd.CommandText;
+            // get string from command
+            StringBuilder sb = new StringBuilder(cmd.CommandText);
+            foreach (SQLiteParameter p in cmd.Parameters)
+            {
+                sb.Replace(p.ParameterName, "'" + p.Value.ToString() + "'");
+            }
+
+            return sb.ToString();
         }
 
         /// <summary>
@@ -290,7 +306,7 @@ namespace CineBank
             cmd.CommandText = @"CREATE TABLE IF NOT EXISTS movies (Id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, Title TEXT (255) UNIQUE NOT NULL, Description TEXT NOT NULL, Duration TEXT (10) NOT NULL, Type INTEGER NOT NULL, Released TEXT (10), Cast TEXT, Director TEXT, Score TEXT, MaxResolution TEXT (10), Age TEXT (10), Notes TEXT);";
             cmd.ExecuteNonQuery();
 
-            cmd.CommandText = @"CREATE TABLE IF NOT EXISTS files (Id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, Movie INTEGER REFERENCES movies (Id) ON DELETE CASCADE NOT NULL, Type INTEGER NOT NULL, Open INTEGER NOT NULL, Path TEXT NOT NULL UNIQUE);";
+            cmd.CommandText = @"CREATE TABLE IF NOT EXISTS files (Id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, Movie INTEGER REFERENCES movies (Id) ON DELETE CASCADE NOT NULL, Type INTEGER NOT NULL, Open INTEGER NOT NULL, Path TEXT NOT NULL);";
             cmd.ExecuteNonQuery();
 
             cmd.CommandText = @"CREATE TABLE IF NOT EXISTS genres (Id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, Name TEXT (25) UNIQUE NOT NULL);";
@@ -306,6 +322,13 @@ namespace CineBank
             cmd.ExecuteNonQuery();
 
             cmd.CommandText = @"CREATE TABLE IF NOT EXISTS settings (Id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, Key TEXT (25) UNIQUE NOT NULL, Value TEXT NOT NULL);";
+            cmd.ExecuteNonQuery();
+
+            // add unique constraints for m:n
+            cmd.CommandText = @"CREATE UNIQUE INDEX UNQ_Genre ON movies2genres(Genre, Movie);";
+            cmd.ExecuteNonQuery();
+
+            cmd.CommandText = @"CREATE UNIQUE INDEX UNQ_Languages ON movies2languages(Language, Movie, Type);";
             cmd.ExecuteNonQuery();
 
             // insert settings
