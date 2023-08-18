@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CineBank
+namespace CineBank.Classes
 {
     /// <summary>
     /// Class that represents the movies/ series stored in the database.
@@ -486,7 +486,15 @@ namespace CineBank
         /// <param name="db">Database to remove information from</param>
         public void Delete(Database db)
         {
+            if (Id != default(long)) // check that id is set --> means that item aready in db
+            {
+                // delete self from database --> constraints will automatically remove m:n-connections
+                db.Delete("movies", "Id", Id.ToString());
 
+                // delete all connected files
+                foreach (LinkedFile lf in Files)
+                    lf.Delete(db);
+            }
         }
 
         public enum MovieType : ushort

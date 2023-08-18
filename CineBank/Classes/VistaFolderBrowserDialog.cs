@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Interop;
 using Microsoft.Win32;
 
-namespace CineBank
+namespace CineBank.Classes
 {
     public sealed class VistaFolderBrowserDialog
     {

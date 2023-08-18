@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CineBank
+namespace CineBank.Classes
 {
     /// <summary>
     /// Class that represents files and their properties that are linked to a movie in the database
@@ -85,7 +85,10 @@ namespace CineBank
         /// <param name="db">Database to remove information from</param>
         public void Delete(Database db)
         {
-
+            if (Id != default(long)) // check that id is set --> means that item aready in db
+            {
+                db.Delete("files", "Id", Id.ToString());
+            }
         }
 
         /// <summary>

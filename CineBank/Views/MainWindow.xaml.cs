@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CineBank.Classes;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -239,6 +240,7 @@ namespace CineBank
             // display object in preview
             try
             {
+                // list data
                 if (!String.IsNullOrWhiteSpace(mov.CoverPath))
                     imgCoverPath.Source = new BitmapImage(new Uri(mov.CoverPath));
                 tbTitle.Text = mov.Title;
@@ -257,6 +259,15 @@ namespace CineBank
                 tbFormat.Text = mov.Format;
                 tbAge.Text = mov.Age;
                 tbNotes.Text = mov.Notes;
+
+                // list playable files
+                cbPlay.Items.Clear();
+                foreach (var item in mov.Files)
+                {
+                    if (item.Open == LinkedFile.OpenWith.None)
+                        continue;
+                    cbPlay.Items.Add(item);
+                }
             } catch
             {
                 imgCoverPath.Source = null;
@@ -277,7 +288,23 @@ namespace CineBank
                 tbAge.Text = "";
 
                 tbNotes.Text = "WARNING: Failed to load data.";
+
+                cbPlay.Items.Clear();
             }
+        }
+
+        // play video
+        private void btnPlay_Click(object sender, RoutedEventArgs e)
+        {
+            // check if selection is valid
+            if (cbPlay.SelectedItem == null)
+                return;
+            // extract selected object
+            LinkedFile lf = cbPlay.SelectedItem as LinkedFile;
+            // add baseDir for relative paths (if string is empty nothing changes)
+            string path = baseDir + lf.Path;
+
+            // select method to open file
         }
 
         protected override void OnKeyDown(KeyEventArgs e)

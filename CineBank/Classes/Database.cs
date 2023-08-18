@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CineBank
+namespace CineBank.Classes
 {
     public class Database
     {
@@ -189,6 +189,21 @@ namespace CineBank
             cmd.Prepare();
 
             // update in db
+            cmd.ExecuteNonQuery();
+        }
+
+        /// <summary>
+        /// Delete an item from a arbitrary table using a column and value to search.
+        /// </summary>
+        /// <param name="table">Name of the table to delete item from</param>
+        /// <param name="column">Name of the column to use for the selection of the item(s) to delete</param>
+        /// <param name="value">Value the column must have to be selected</param>
+        public void Delete(string table, string column, string value)
+        {
+            using var cmd = new SQLiteCommand(Connection);
+            cmd.CommandText = "DELETE FROM " + table + " WHERE " + column + " = @value;";
+            cmd.Parameters.AddWithValue("@value", value);
+            cmd.Prepare();
             cmd.ExecuteNonQuery();
         }
 
