@@ -14,7 +14,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <GroupBox Header="Search for information (IMDB)" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0">
+        <GroupBox Header="Search for information (TMDB)" x:Name="gbSearchInfo" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0">
             <Grid Grid.Column="1" Grid.Row="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>

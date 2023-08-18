@@ -282,7 +282,7 @@ namespace CineBank.Classes
                 baseDir = db.Config.BaseDir;
 
             // get cover and set CoverPath
-            res = db.Query("SELECT Path FROM files WHERE Id = " + Id + " AND Open = " + (int)LinkedFile.OpenWith.None + ";");
+            res = db.Query("SELECT Path FROM files WHERE Movie = " + Id + " AND Open = " + (int)LinkedFile.OpenWith.None + ";");
             if (res == null || res.Length < 2) // validate items where found
                 Console.WriteLine("WARNING: Movie: Failed to get cover from movie with ID " + Id);
             else

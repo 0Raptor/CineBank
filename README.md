@@ -31,6 +31,7 @@ The file will be created automatically if you run the `UpdateConfiguration.ps1`-
 		<validateChecksums>true</validateChecksums><!-- if true prgram will validate that config has not been changed using checksum in HKLM:\SOFTWARE\CineBank\ConfigCksm -->
 		<baseDir></baseDir><!-- OPTIONAL: Specify a baseDir and store relative paths in the databse. This parameter overrides the baseDir specified in the database -->
 		<dbPath></dbPath> <!-- OPTIONAL: Path to SQLite-database to load at startup. If not specified must be supplied via commandline parameter -->
+		<tmdbApiKey></tmdbApiKey> <!-- OPTIONAL: API-Key for https://www.themoviedb.org/ -->
 	</config>
 	<checksums>
 		<!-- contains checksums of powershell skripts used by the program to play files - program will check their integrity during start -->

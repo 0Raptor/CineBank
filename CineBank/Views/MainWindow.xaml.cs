@@ -39,6 +39,7 @@ namespace CineBank
 
         string workingDir = "";
         string baseDir = "";
+        string apiKey = "";
         Database db = new Database();
         List<Movie> movies = new List<Movie>();
 
@@ -225,6 +226,9 @@ namespace CineBank
             // precheck: database current version
             // if not open dialog to update [this function must be implemented, when scheme will change in the future]
 
+            // get TMDB-API-Key
+            try { apiKey = doc.SelectSingleNode("xml/config/tmdbApiKey").InnerText; } catch { }
+
             // get data
             movies = Movie.GetMovies(db);
             lbMovies.ItemsSource = movies;
@@ -243,6 +247,8 @@ namespace CineBank
                 // list data
                 if (!String.IsNullOrWhiteSpace(mov.CoverPath))
                     imgCoverPath.Source = new BitmapImage(new Uri(mov.CoverPath));
+                else 
+                    imgCoverPath.Source = null;
                 tbTitle.Text = mov.Title;
                 tbDescription.Text = mov.Description;
                 tbType.Text = Enum.GetName(typeof(Movie.MovieType), mov.Type);
@@ -388,7 +394,7 @@ namespace CineBank
         private void MenuItem_Add_Click(object sender, RoutedEventArgs e)
         {
             Movie? m = null;
-            EntryWindow w = new EntryWindow(ref m, db);
+            EntryWindow w = new EntryWindow(ref m, db, apiKey);
             w.Show();
         }
 
@@ -401,7 +407,7 @@ namespace CineBank
             // extract selected object
             Movie mov = lbMovies.SelectedItem as Movie;
 
-            EntryWindow w = new EntryWindow(ref mov, db);
+            EntryWindow w = new EntryWindow(ref mov, db, apiKey);
             w.Show();
         }
         #endregion

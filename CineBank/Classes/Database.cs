@@ -65,7 +65,25 @@ namespace CineBank.Classes
                         res.Add(reader.GetString(1), reader.GetString(2));
                     }
 
-                    Config = new DatabaseConfig(res["baseDir"], res["version"]);
+                    if (res.ContainsKey("apiLanguage") && res.ContainsKey("castPerMovie") && res.ContainsKey("includeCharacterWithCast") && 
+                        res.ContainsKey("downloadPosterFromAPI"))
+                    {
+                        try
+                        {
+                            int lg = Convert.ToInt32(res["apiLanguage"]);
+                            int cnt = Convert.ToInt32(res["castPerMovie"]);
+                            bool include = (res["includeCharacterWithCast"].ToLower() == "true");
+                            bool download = (res["downloadPosterFromAPI"].ToLower() == "true");
+
+                            Config = new DatabaseConfig(res["baseDir"], res["version"], lg, cnt, include, download);
+                        } catch (Exception ex)
+                        {
+                            Console.WriteLine("WARNING: Database: Table 'settings' contains invalid values. Ignroing...: " + ex.Message);
+                            Config = new DatabaseConfig(res["baseDir"], res["version"]);
+                        }
+                    }
+                    else
+                        Config = new DatabaseConfig(res["baseDir"], res["version"]);
                 }
             }
 
@@ -388,14 +406,25 @@ namespace CineBank.Classes
 
     public class DatabaseConfig
     {
+        // base configuration
         public string BaseDir { get; set; }
         public string Version { get; set; }
+        // api configuration
+        public int ApiLanguage { get; set; } // compare EntryWindow: cbFetchLang.SelectedIndex
+        public int CastPerMovie { get; set; }
+        public bool IncludeCharacterWithCast { get; set; }
+        public bool DownloadPosterFromAPI { get; set; }
 
         public DatabaseConfig() { }
-        public DatabaseConfig(string baseDir, string version = "1.0")
+        public DatabaseConfig(string baseDir, string version = "1.0", int apiLanguage = 0, int castPerMovie = 7, bool includeCharacterWithCast = false,
+            bool downloadPosterFromAPI = false)
         {
             BaseDir = baseDir;
             Version = version;
+            ApiLanguage = apiLanguage;
+            CastPerMovie = castPerMovie;
+            IncludeCharacterWithCast = includeCharacterWithCast;
+            DownloadPosterFromAPI = downloadPosterFromAPI;
         }
     }
 }
