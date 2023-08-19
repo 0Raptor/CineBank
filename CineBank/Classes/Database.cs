@@ -374,6 +374,18 @@ namespace CineBank.Classes
             cmd.Parameters.AddWithValue("@dir", conf.BaseDir);
             cmd.Prepare();
             cmd.ExecuteNonQuery();
+
+            cmd.CommandText = "INSERT INTO settings(Key, Value) VALUES('apiLanguage', '0')";
+            cmd.ExecuteNonQuery();
+
+            cmd.CommandText = "INSERT INTO settings(Key, Value) VALUES('castPerMovie', '7')";
+            cmd.ExecuteNonQuery();
+
+            cmd.CommandText = "INSERT INTO settings(Key, Value) VALUES('includeCharacterWithCast', 'false')";
+            cmd.ExecuteNonQuery();
+
+            cmd.CommandText = "INSERT INTO settings(Key, Value) VALUES('downloadPosterFromAPI', 'false')";
+            cmd.ExecuteNonQuery();
         }
 
         /// <summary>
@@ -425,6 +437,21 @@ namespace CineBank.Classes
             CastPerMovie = castPerMovie;
             IncludeCharacterWithCast = includeCharacterWithCast;
             DownloadPosterFromAPI = downloadPosterFromAPI;
+        }
+
+        public void UpdateInDB(Database db)
+        {
+            string addCharNames = "";
+            if (IncludeCharacterWithCast) addCharNames = "true"; else addCharNames = "false";
+            string downlaodPoster = "";
+            if (DownloadPosterFromAPI) downlaodPoster = "true"; else downlaodPoster = "false";
+
+            db.Update("settings", "Key", "baseDir", new Dictionary<string, string>() { { "Value", BaseDir } });
+            db.Update("settings", "Key", "version", new Dictionary<string, string>() { { "Value", Version } });
+            db.Update("settings", "Key", "apiLanguage", new Dictionary<string, string>() { { "Value", ApiLanguage.ToString() } });
+            db.Update("settings", "Key", "castPerMovie", new Dictionary<string, string>() { { "Value", CastPerMovie.ToString() } });
+            db.Update("settings", "Key", "includeCharacterWithCast", new Dictionary<string, string>() { { "Value", addCharNames } });
+            db.Update("settings", "Key", "downloadPosterFromAPI", new Dictionary<string, string>() { { "Value", downlaodPoster } });
         }
     }
 }

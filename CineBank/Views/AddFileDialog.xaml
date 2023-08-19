@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CineBank"
         mc:Ignorable="d"
-        Title="CB - Add File(s)" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen">
+        Title="CB - Add File(s)" SizeToContent="WidthAndHeight" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Grid Margin="15">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -31,11 +31,11 @@
         <RadioButton Grid.Column="1" Grid.Row="1" x:Name="rbTypeFolder" Content="Folder" Margin="100,0,0,0" VerticalAlignment="Center" GroupName="rbGroup" Checked="rbGroup_Checked"/>
 
         <Label Grid.Column="1" Grid.Row="2">Select folder</Label>
-        <TextBox Name="tbFolder" Grid.Column="1" Grid.Row="3" MinWidth="250" IsReadOnly="True"></TextBox>
+        <TextBox Name="tbFolder" Grid.Column="1" Grid.Row="3" Width="250" IsReadOnly="True"></TextBox>
         <Button Name="btnFolder" Grid.Column="2" Grid.Row="3" Margin="10,0,0,0" Width="20" Click="btnSelectFiles_Click">...</Button>
 
         <Label Grid.Column="1" Grid.Row="4">Select file(s) - must be of same kind</Label>
-        <TextBox Name="tbFiles" Grid.Column="1" Grid.Row="5" MinWidth="250" IsReadOnly="True"></TextBox>
+        <TextBox Name="tbFiles" Grid.Column="1" Grid.Row="5" Width="250" IsReadOnly="True"></TextBox>
         <Button Name="btnFiles" Grid.Column="2" Grid.Row="5" Margin="10,0,0,0" Width="20" Click="btnSelectFiles_Click">...</Button>
 
         <Label Grid.Column="1" Grid.Row="6">Mediatype</Label>

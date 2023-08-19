@@ -235,6 +235,17 @@ namespace CineBank
 
         private void btnSelectCover_Click(object sender, RoutedEventArgs e)
         {
+            // get current cover object in mov.Files --> needs to be removed if new cover is selected
+            LinkedFile oldCover = null;
+            if (!String.IsNullOrWhiteSpace(tbImage.Text))
+            {
+                foreach (var item in mov.Files)
+                {
+                    if (item.Path == tbImage.Text)
+                        oldCover = item;
+                }
+            }
+
             // supported media types: https://learn.microsoft.com/en-us/dotnet/desktop/wpf/graphics-multimedia/imaging-overview?view=netframeworkdesktop-4.8
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Title = "Select cover graphic...";
@@ -242,8 +253,17 @@ namespace CineBank
             ofd.CheckFileExists = true;
             ofd.CheckPathExists = true;
             ofd.Multiselect = false;
-            if (ofd.ShowDialog() == true)
+            if (ofd.ShowDialog() == true) // new file was selected
             {
+                // remove old cover
+                if (oldCover != null)
+                {
+                    files.Remove(oldCover);
+                    files2remove.Add(oldCover);
+                    oldCover.Delete(db);
+                }
+
+                // store new cover
                 mov.CoverPath = ofd.FileName;
                 LinkedFile lf = new LinkedFile(LinkedFile.FileType.Image, LinkedFile.OpenWith.None, ofd.FileName);
                 files.Add(lf);

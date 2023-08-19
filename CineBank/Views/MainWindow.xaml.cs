@@ -39,6 +39,7 @@ namespace CineBank
 
         string workingDir = "";
         string baseDir = "";
+        string baseDirSource = "";
         string apiKey = "";
         Database db = new Database();
         List<Movie> movies = new List<Movie>();
@@ -140,12 +141,14 @@ namespace CineBank
             if (args.Length > 3 && !String.IsNullOrWhiteSpace(args[2])) // use baseDir from commandline args
             {
                 baseDir = args[2];
+                baseDirSource = "Arguments";
             }
             else // use db from config
             {
                 try
                 {
                     baseDir = doc.SelectSingleNode("xml/config/baseDir").InnerText;
+                    baseDirSource = "config.xml";
                 }
                 catch
                 {
@@ -214,7 +217,7 @@ namespace CineBank
                 
             }
             // connect to db
-            if (String.IsNullOrWhiteSpace(baseDir)) baseDir = "";
+            if (String.IsNullOrWhiteSpace(baseDir)) { baseDir = ""; baseDirSource = "Database"; }
             db = new Database(dbPath, baseDir);
 
             // precheck: basedir not specified via apllication nor db but required
@@ -387,7 +390,8 @@ namespace CineBank
 
         private void MenuItem_Settings_Click(object sender, RoutedEventArgs e)
         {
-
+            SettingsWindow settingsWindow = new SettingsWindow(db, baseDirSource);
+            settingsWindow.Show();
         }
 
         // display windows to add a new movie. pass null to constructor to ensure a new movie-object will be created.

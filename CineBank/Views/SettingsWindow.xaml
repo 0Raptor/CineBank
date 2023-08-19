@@ -1,0 +1,107 @@
+﻿<Window x:Class="CineBank.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CineBank"
+        mc:Ignorable="d"
+        Title="CineBank - Settings" Height="440" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <GroupBox Grid.Row="0" Header="Basic configuration">
+            <Grid Margin="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="10px"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="5px"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="BaseDir *"/>
+                <TextBlock Grid.Row="0" Grid.Column="2" Text="Directory to expect all media files in. Leave empty to store all files with absolute path. If empty files can be stored everywhere on your system. You can define a value that is stored in the database. This value will be overriden if BaseDir is configured in 'config.xml' or commandline argument." TextWrapping="Wrap"/>
+                <TextBlock Grid.Row="1" Grid.Column="2" Text="Currently configured via:" TextWrapping="Wrap"/>
+                <TextBlock x:Name="lblBaseDirSource" Grid.Row="1" Grid.Column="2" Margin="140,0,0,0" Text="[INSERT]" TextWrapping="Wrap"/>
+                <Grid Grid.Row="2" Grid.Column="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="tbBaseDir" Grid.Column="0" HorizontalAlignment="Stretch"/>
+                    <Button Grid.Column="1" Margin="10,0,0,0" Width="20" Click="btnSelectBaseDir_Click">...</Button>
+                </Grid>
+                
+
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="DB Version"/>
+                <TextBlock x:Name="lblDbVersion" Grid.Row="4" Grid.Column="2" Text="1.0" TextWrapping="Wrap"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Grid.Row="1" Header="API configuration">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <TextBlock Grid.Row="0" TextWrapping="Wrap">
+                    Leave API-Key empty to disable API functions. API-Key can be obtained as described in "https://developer.themoviedb.org/docs".
+                </TextBlock>
+                <Grid Grid.Row="1" Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="5px"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Language"/>
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Language to get API results in." TextWrapping="Wrap"/>
+                    <ComboBox x:Name="cbLanguage" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Stretch">
+                        <ComboBoxItem>EN</ComboBoxItem>
+                        <ComboBoxItem>DE</ComboBoxItem>
+                    </ComboBox>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="CastToSave"/>
+                    <TextBlock Grid.Row="2" Grid.Column="2" Text="Number of actors/actresses that should be stored per movie. Set to -1 to get all." TextWrapping="Wrap"/>
+                    <TextBox x:Name="tbCastToSave" Grid.Row="3" Grid.Column="2" HorizontalAlignment="Stretch"/>
+
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="CharacterNames"/>
+                    <CheckBox x:Name="cbCharNames"  Grid.Row="4" Grid.Column="2" Content="Also store name of the character an actor/actress played."/>
+
+                    <TextBlock Grid.Row="5" Grid.Column="0" Text="DownloadPoster"/>
+                    <TextBlock Grid.Row="5" Grid.Column="2" Text="Posters will be downloaded into BaseDir. If it is not defined the user's picture folder will be used." TextWrapping="Wrap"/>
+                    <CheckBox x:Name="cbDownloadPoster" Grid.Row="6" Grid.Column="2" Content="If available download movie poster from API."/>
+                </Grid>
+            </Grid>
+        </GroupBox>
+
+        <TextBlock Grid.Row="3" Margin="5">
+            * This comfiguration must or can be defined in the "config.xml"-file. 
+        </TextBlock>
+
+        <Button Grid.Row="4" Content="Edit 'config.xml' via script" Width="165" Click="btnOpenConf_Click"/>
+
+        <Button x:Name="btnImport" Content="Close" HorizontalAlignment="Center" Margin="90,10,0,0" Grid.Row="5" VerticalAlignment="Top" Width="75" Click="btnAbort_Click"/>
+        <Button x:Name="btnCancel" Content="Save" HorizontalAlignment="Center" Margin="0,10,90,0" Grid.Row="5" VerticalAlignment="Top" Width="76" Click="btnSave_Click"/>
+    </Grid>
+</Window>
