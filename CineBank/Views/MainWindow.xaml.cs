@@ -332,7 +332,7 @@ namespace CineBank
         /// Genereates the SHA256-Hash of a file
         /// </summary>
         /// <param name="path">Path to the file to hash</param>
-        /// <returns>SHA256-Hash of the file as UTF8 string</returns>
+        /// <returns>SHA256-Hash of the file as Base64 string</returns>
         string GetFileHash(string path)
         {
             using (SHA256 sha = SHA256.Create())
@@ -347,7 +347,7 @@ namespace CineBank
                         // Compute the hash of the fileStream.
                         byte[] hashValue = sha.ComputeHash(fileStream);
                         // return hash value of the file
-                        return Encoding.UTF8.GetString(hashValue);
+                        return Convert.ToBase64String(hashValue);
                     }
                     catch (IOException e)
                     {
