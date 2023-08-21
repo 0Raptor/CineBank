@@ -1,6 +1,8 @@
 ﻿using CineBank.Classes;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -66,7 +68,17 @@ namespace CineBank
             string registryCksm = "";
             try
             {
-                registryCksm = File.ReadAllText("HKLM:\\SOFTWARE\\CineBank\\ConfigCksm");
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey("Software\\CineBank"))
+                {
+                    if (key != null)
+                    {
+                        Object o = key.GetValue("ConfigCksm");
+                        if (o != null)
+                        {
+                            registryCksm = o as String;  //"as" because it's REG_SZ...otherwise ToString() might be safe(r)
+                        }
+                    }
+                }
             } catch { }
             // xml-object
             XmlDocument doc = new XmlDocument();
@@ -94,6 +106,7 @@ namespace CineBank
                     string expectedCksm = "";
                     try
                     {
+                        if (script.Key == "Setup") continue;
                         expectedCksm = doc.SelectSingleNode("xml/checksums/" + script.Key).InnerText;
                     }
                     catch
@@ -237,6 +250,22 @@ namespace CineBank
             lbMovies.ItemsSource = movies;
         }
 
+        // filter for movies
+        private void FilterMovies()
+        {
+            if (!String.IsNullOrWhiteSpace(tbSearch.Text)) // search string is supplied
+            {
+                movies = Movie.GetMovies(db, tbSearch.Text);
+                lbMovies.ItemsSource = movies;
+            }
+            else
+            {
+                movies = Movie.GetMovies(db);
+                lbMovies.ItemsSource = movies;
+            }
+        }
+
+        // user selected a movie from list --> display
         private void lbMovies_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // check if selection is valid
@@ -310,10 +339,41 @@ namespace CineBank
                 return;
             // extract selected object
             LinkedFile lf = cbPlay.SelectedItem as LinkedFile;
-            // add baseDir for relative paths (if string is empty nothing changes)
-            string path = baseDir + lf.Path;
+
+            // get information and prepare them for script
+            string path = lf.Path;
+            string dir = System.IO.Path.GetDirectoryName(path);
 
             // select method to open file
+            string script = workingDir;
+            switch (lf.Open)
+            {
+                case LinkedFile.OpenWith.Video1:
+                    script += HelperScripts["Video1"];
+                    break;
+                case LinkedFile.OpenWith.Video2:
+                    script += HelperScripts["Video2"];
+                    break;
+                case LinkedFile.OpenWith.DVDPlayer:
+                    script += HelperScripts["DVDPlayer"];
+                    break;
+                case LinkedFile.OpenWith.BRPlayer:
+                    script += HelperScripts["BRPlayer"];
+                    break;
+                case LinkedFile.OpenWith.AudioPlayer:
+                    script += HelperScripts["AudioPlayer"];
+                    break;
+                case LinkedFile.OpenWith.Undefined: // let os decide how to open this software
+                    Process.Start(path);
+                    return; // end function
+                default:
+                    MessageBox.Show("Unable to detect the method to open this file.", "Failed to open", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+                    break;
+            }
+
+            // open file using the selected script
+            string scriptArguments = "-File \"" + script + "\" -path \"" + path + "\" -dir \"" + dir + "\""; // -ExecutionPolicy Bypass
+            Process.Start("powershell.exe", scriptArguments);
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
@@ -364,6 +424,11 @@ namespace CineBank
         #endregion
 
         #region MenuItem
+        private void MenuItem_NotImplemented_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Sorry, this feature is not implemented yet.", "Feature not implemented");
+        }
+
         private void MenuItem_Exit_Click(object sender, RoutedEventArgs e)
         {
             Environment.Exit(0);
@@ -414,6 +479,52 @@ namespace CineBank
             EntryWindow w = new EntryWindow(ref mov, db, apiKey);
             w.Show();
         }
+
+        private void MenuItem_Help_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start(@"https://github.com/0Raptor/CineBank");
+        }
+
+        private void EditHelperScripts(string path)
+        {
+            Process.Start(@"C:\WINDOWS\system32\WindowsPowerShell\v1.0\powershell_ise.exe", workingDir + path);
+        }
+
+        private void MenuItem_EditV1_Click(object sender, RoutedEventArgs e)
+        {
+            EditHelperScripts(HelperScripts["Video1"]);
+        }
+
+        private void MenuItem_EditV2_Click(object sender, RoutedEventArgs e)
+        {
+            EditHelperScripts(HelperScripts["Video2"]);
+        }
+
+        private void MenuItem_EditDVD_Click(object sender, RoutedEventArgs e)
+        {
+            EditHelperScripts(HelperScripts["DVDPlayer"]);
+        }
+
+        private void MenuItem_EditBR_Click(object sender, RoutedEventArgs e)
+        {
+            EditHelperScripts(HelperScripts["BRPlayer"]);
+        }
+
+        private void MenuItem_EditA_Click(object sender, RoutedEventArgs e)
+        {
+            EditHelperScripts(HelperScripts["AudioPlayer"]);
+        }
+
+        private void btnSearch_Click(object sender, RoutedEventArgs e)
+        {
+            FilterMovies();
+        }
         #endregion
+
+        private void tbSearch_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+                FilterMovies();
+        }
     }
 }

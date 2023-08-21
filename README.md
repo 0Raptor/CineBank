@@ -1,17 +1,19 @@
 # CineBank
 
-Open source local video management solution for Windows. Manage all your movies and series inside a central tool, store metadata and launch them in your preferred media player.  
-Mounting your ISOs or playing any type of media file can be achieved through completely customizable PowerShell-scripts. To avoid that unauthorized users mess with your scripts, integrity checks can be enabled. 
+Open source local video management solution for Windows.
+Manage all your movies and series inside a central tool, store metadata and launch them in your preferred media player.
 
-Third implementation of its kind. Last try: [LocalCineBank](https://git.0raptor.earth/Raptor/LocalCineBank) (never published)
+The execution is realized through customizable PowerShell-scripts to grant you full control about how the files are going to be opened.
+Mounting your ISOs or playing any type of media file with any software can be achieved easily.
+To avoid unauthorized users messing with your scripts, integrity checks can be enabled.
 
-For information about the design of the application check [Developer Manual](DEV.md).
+For information about the design of the application, check the [Developer Manual](DEV.md).
 
 ## Installation
 
-1. Download latest release from [Missing]()
+1. Download latest release from [GitHub](https://github.com/0Raptor/CineBank/releases)
 2. Extract software on your machine
-3. Adapt powershell scripts
+3. Adapt powershell scripts in "Scripts"-Subfolder
 4. Run initial configuration
 5. (optional) Create a desktop shortcut
 6. Start applicaton
@@ -27,22 +29,22 @@ The file will be created automatically if you run the `UpdateConfiguration.ps1`-
 ```XML
 <?xml version="1.0" encoding="utf-8"?>
 <xml>
-	<config>
-		<validateChecksums>true</validateChecksums><!-- if true prgram will validate that config has not been changed using checksum in HKLM:\SOFTWARE\CineBank\ConfigCksm -->
-		<baseDir></baseDir><!-- OPTIONAL: Specify a baseDir and store relative paths in the databse. This parameter overrides the baseDir specified in the database -->
-		<dbPath></dbPath> <!-- OPTIONAL: Path to SQLite-database to load at startup. If not specified must be supplied via commandline parameter -->
-		<tmdbApiKey></tmdbApiKey> <!-- OPTIONAL: API-Key for https://www.themoviedb.org/ -->
-	</config>
-	<checksums>
-		<!-- contains checksums of powershell skripts used by the program to play files - program will check their integrity during start -->
-		<!-- as the checksum of the config itself will be validated these checksums could not have been modified without administrative rights on your system -->
-		<Video1></Video1> <!-- each node contains one checksum - auto generated! -->
-		<Video2></Video2>
-		<DVDPlayer></DVDPlayer>
-		<BRPlayer></BRPlayer>
-		<AudioPlayer></AudioPlayer>
-		<Setup></Setup>
-	</checksums>
+ <config>
+  <validateChecksums>true</validateChecksums><!-- if true prgram will validate that config has not been changed using checksum in HKLM:\SOFTWARE\CineBank\ConfigCksm -->
+  <baseDir></baseDir><!-- OPTIONAL: Specify a baseDir and store relative paths in the databse. This parameter overrides the baseDir specified in the database -->
+  <dbPath></dbPath> <!-- OPTIONAL: Path to SQLite-database to load at startup. If not specified must be supplied via commandline parameter -->
+  <tmdbApiKey></tmdbApiKey> <!-- OPTIONAL: API-Key for https://www.themoviedb.org/ -->
+ </config>
+ <checksums>
+  <!-- contains checksums of powershell skripts used by the program to play files - program will check their integrity during start -->
+  <!-- as the checksum of the config itself will be validated these checksums could not have been modified without administrative rights on your system -->
+  <Video1></Video1> <!-- each node contains one checksum - auto generated! -->
+  <Video2></Video2>
+  <DVDPlayer></DVDPlayer>
+  <BRPlayer></BRPlayer>
+  <AudioPlayer></AudioPlayer>
+  <Setup></Setup>
+ </checksums>
 </xml>
 ```
 
@@ -50,8 +52,9 @@ The file will be created automatically if you run the `UpdateConfiguration.ps1`-
 
 Ideas that might be implemented in the future:
 
-1. Implement additional DBMS through turning Database-class into a virtual class and creating derived classes for each DBMS.
-2. Store information about people (Cast, Director, Score) in own table.
+1. Implement filtering for genre, languages, etc. during search
+2. Implement additional DBMS through turning Database-class into a virtual class and creating derived classes for each DBMS.
+3. Store information about people (Cast, Director, Score) in own table.
 
 ## License
 

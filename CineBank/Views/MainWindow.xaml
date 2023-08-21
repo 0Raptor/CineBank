@@ -19,9 +19,8 @@
                     <MenuItem Header="_Settings (F6)" Click="MenuItem_Settings_Click"/>
                     <MenuItem Header="_Refresh (F5)" Click="MenuItem_Reload_Click"/>
                     <Separator />
-                    <MenuItem Header="_Open Database"/>
-                    <MenuItem Header="_New Database"/>
-                    <MenuItem Header="_Create Database From Legacy Folder Structure"/>
+                    <MenuItem Header="_Open Database"  Click="MenuItem_NotImplemented_Click"/>
+                    <MenuItem Header="_New Database" Click="MenuItem_NotImplemented_Click"/>
                     <Separator />
                     <MenuItem Header="_Exit" Click="MenuItem_Exit_Click"/>
                 </MenuItem>
@@ -30,16 +29,17 @@
                     <MenuItem Header="_Edit Movie (F2)" Click="MenuItem_Edit_Click"/>
                     <MenuItem Header="_Delete Entry (DEL)" Click="MenuItem_Delete_Click"/>
                     <Separator/>
-                    <MenuItem Header="_Lauch MP4"/>
-                    <MenuItem Header="_Lauch Video File"/>
-                    <MenuItem Header="_Lauch DVD ISO"/>
-                    <MenuItem Header="_Lauch DVD Folder"/>
-                    <MenuItem Header="_Lauch Blu-Ray ISO"/>
-                    <MenuItem Header="_Lauch Blu-Ray Folder"/>
+                    <MenuItem Header="_Edit Launch Scripts">
+                        <MenuItem Header="_Lauch Video File Software 1" Click="MenuItem_EditV1_Click"/>
+                        <MenuItem Header="_Lauch Video File Software 2" Click="MenuItem_EditV2_Click"/>
+                        <MenuItem Header="_Lauch DVD ISO/ Folder" Click="MenuItem_EditDVD_Click"/>
+                        <MenuItem Header="_Lauch Blu-Ray ISO/ Folder" Click="MenuItem_EditBR_Click"/>
+                        <MenuItem Header="_Lauch Audio File/ Folder Containing Them" Click="MenuItem_EditA_Click"/>
+                    </MenuItem>
                     <Separator/>
-                    <MenuItem Header="_Export to JSON"/>
+                    <MenuItem Header="_Export to JSON" Click="MenuItem_NotImplemented_Click"/>
                 </MenuItem>
-                <MenuItem Header="_Help"></MenuItem>
+                <MenuItem Header="_Help" Click="MenuItem_Help_Click"/>
             </Menu>
         </DockPanel>
 
@@ -61,8 +61,8 @@
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBox Grid.Column="0" x:Name="tbSearch" VerticalAlignment="Stretch" Margin="5"/>
-                    <Button Grid.Column="1" x:Name="btnSearch" Margin="0, 5">Search</Button>
+                    <TextBox Grid.Column="0" x:Name="tbSearch" VerticalAlignment="Stretch" Margin="5" KeyUp="tbSearch_KeyUp"/>
+                    <Button Grid.Column="1" x:Name="btnSearch" Click="btnSearch_Click" Margin="0, 5">Search</Button>
                 </Grid>
 
                 <ListBox Grid.Row="1" Margin="5,0,0,5" HorizontalContentAlignment="Stretch" Name="lbMovies" SelectionChanged="lbMovies_SelectionChanged">

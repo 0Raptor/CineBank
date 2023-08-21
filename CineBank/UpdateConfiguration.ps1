@@ -1,14 +1,14 @@
 ﻿# CineBank Config Editor
 
 # FUNCTIONS
-$files = {
-    { "Video1", "$PSScriptRoot\Scripts\VideoPlayer1.ps1", "" },
-    { "Video2", "$PSScriptRoot\Scripts\VideoPlayer2.ps1", "" },
-    { "DVDPlayer", "$PSScriptRoot\Scripts\DVDPlayer.ps1", "" },
-    { "BRPlayer", "$PSScriptRoot\Scripts\BRPlayer.ps1", "" },
-    { "AudioPlayer", "$PSScriptRoot\Scripts\AudioPlayer.ps1", "" },
-    { "Setup", "$PSScriptRoot\UpdateConfiguration.ps1", "" }
-};
+$files = (
+    ( "Video1", "$PSScriptRoot\Scripts\VideoPlayer1.ps1", "" ),
+    ( "Video2", "$PSScriptRoot\Scripts\VideoPlayer2.ps1", "" ),
+    ( "DVDPlayer", "$PSScriptRoot\Scripts\DVDPlayer.ps1", "" ),
+    ( "BRPlayer", "$PSScriptRoot\Scripts\BRPlayer.ps1", "" ),
+    ( "AudioPlayer", "$PSScriptRoot\Scripts\AudioPlayer.ps1", "" ),
+    ( "Setup", "$PSScriptRoot\UpdateConfiguration.ps1", "" )
+)
 function Create-Config {
     Write-Host "Creating new config..."
     $confPath = "$PSScriptRoot\config.xml"
@@ -83,8 +83,8 @@ function Update-Config {
         $baseDir = Read-Host -Prompt "Path to baseDir"
         # validate input
         if ([String]::IsNullOrWhiteSpace($checkCksm)) { break } # leaft empty
-        elseif ((Get-Item $baseDir) -is [System.IO.DirectoryInfo]) { break } # entered a valid directory
         elseif ($baseDir -eq "_" -and -not [String]::IsNullOrWhiteSpace($oldBaseDir)) { $baseDir = $oldBaseDir; break } # use old value
+        elseif ((Get-Item $baseDir) -is [System.IO.DirectoryInfo]) { break } # entered a valid directory
         else { Write-Host "Entered path is invalid/ not existing. Please leave empty or enter a valid and existing path." } 
     }
 
@@ -95,8 +95,8 @@ function Update-Config {
         $dbPath = Read-Host -Prompt "Path to Database"
         # validate input
         if ([String]::IsNullOrWhiteSpace($dbPath)) { break } # leaft empty
-        elseif ((Get-Item (Split-Path $dbPath)) -is [System.IO.DirectoryInfo]) { break } # entered a valid directory
         elseif ($dbPath -eq "_" -and -not [String]::IsNullOrWhiteSpace($oldDbPath)) { $dbPath = $oldDbPath; break } # use old value
+        elseif ((Get-Item (Split-Path $dbPath)) -is [System.IO.DirectoryInfo]) { break } # entered a valid directory
         else { Write-Host "Entered path is invalid (checked for existing of parent directory). Please leave empty or enter a valid filename in an existing directory." } 
     }
 
@@ -135,6 +135,7 @@ function Update-ConfigCksm {
         [xml]$xml = Get-Content $confPath
         $xml.SelectSingleNode("xml/config/validateChecksums").InnerText = "true" # enable validation
         foreach ($item in $files) {
+            if($item[0] -eq "Setup") { continue }
             $xml.SelectSingleNode("xml/checksums/$($item[0])").InnerText = $item[2] # insert obtained checksums
         }
         $xml.Save($confPath)
@@ -148,11 +149,11 @@ function Update-ConfigCksm {
             New-Item -Path "HKLM:\SOFTWARE" -Name "CineBank"
         }
         # create checksum key of not existing, else update
-        if (-not (Test-Path -Path "HKLM:\SOFTWARE\CineBank\ConfigCksm" -PathType Leaf)) {
-            New-ItemProperty -Path "HKLM:\SOFTWARE\CineBank" -Name "ConfigCksm" -Value $confChksm -PropertyType "String"
+        if (-not ((Get-Item "HKLM:\SOFTWARE\CineBank\").Property -contains "ConfigCksm")) {
+            New-ItemProperty -Path "HKLM:\SOFTWARE\CineBank" -Name "ConfigCksm" -Value $confCksm -PropertyType "String"
         }
         else {
-            Set-ItemProperty -Path "HKLM:\SOFTWARE\CineBank" -Name "ConfigCksm" -Value $confChksm
+            Set-ItemProperty -Path "HKLM:\SOFTWARE\CineBank" -Name "ConfigCksm" -Value $confCksm
         }
     }
     else {

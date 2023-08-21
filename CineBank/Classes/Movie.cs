@@ -517,8 +517,8 @@ namespace CineBank.Classes
             string sql = "SELECT * FROM movies";
             if (!String.IsNullOrWhiteSpace(filter))
             {
-                // TODO extract filter options
-                throw new NotImplementedException("Usings filters to search for special movies is not implemented yet.");
+                sql += " WHERE Title LIKE @filter";
+                sql = db.PrepareSecureSQLStatement(sql, new Dictionary<string, string>() { { "@filter", "%" + filter + "%" } });
             }
 
             // get data and check results
