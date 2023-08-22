@@ -182,61 +182,19 @@ namespace CineBank
                 if (res == MessageBoxResult.No)
                     return;
 
-                DatabaseConfig? conf = null;
-                if (!String.IsNullOrWhiteSpace(baseDir))
-                    conf = new DatabaseConfig(baseDir);
-
-                // get db settings for new db from user
-                CreateDbDialog dlg = new CreateDbDialog(dbPath, baseDir);
-                if (dlg.ShowDialog() == true)
-                {
-                    dbPath = dlg.Answer[0];
-                    baseDir = dlg.Answer[1];
-                    if (!String.IsNullOrWhiteSpace(baseDir))
-                        conf = new DatabaseConfig(baseDir);
-
-                    // create new db
-                    try
-                    {
-                        Database.Init(dbPath, conf);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("Failed to create new database at '" + dbPath + "'!\r\n" + ex.Message, "Failed to create new database", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return;
-                    }
-
-                    // update config
-                    res = MessageBox.Show("Database successfully created.\r\nAdd database path to config (this might fail due to lack of permission and need a checksum refresh - check README)?", "New database", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                    if (res == MessageBoxResult.Yes)
-                    {
-                        try
-                        {
-                            doc.SelectSingleNode("xml/config/dbPath").InnerText = dbPath;
-                            doc.SelectSingleNode("xml/config/baseDir").InnerText = baseDir;
-                            doc.Save(workingDir + "config.xml");
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show("Configuration updated failed: " + ex.Message + "\r\nPlease add dbPath amd baseDir via the PowerShell-script.", "Config update failed", MessageBoxButton.OK, MessageBoxImage.Information);
-                        }
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("No database found.\r\nYou can create one via the tooltip.", "No database", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-                
+                CreateDatabase(dbPath, doc);
             }
-            // connect to db
-            if (String.IsNullOrWhiteSpace(baseDir)) { baseDir = ""; baseDirSource = "Database"; }
-            db = new Database(dbPath, baseDir);
-
-            // precheck: basedir not specified via apllication nor db but required
-            if (String.IsNullOrWhiteSpace(db.Config.BaseDir) && String.IsNullOrWhiteSpace(baseDir) && !db.CheckFilesHaveAbsolutePath())
+            else
             {
-                MessageBox.Show("There is no baseDir specified in the database, config and arguments but some files do not have absolute paths.\r\nUnexpected behavior may occur.", "Found incomplete paths", MessageBoxButton.OK, MessageBoxImage.Warning);
+                // connect to db
+                if (String.IsNullOrWhiteSpace(baseDir)) { baseDir = ""; baseDirSource = "Database"; }
+                db = new Database(dbPath, baseDir);
+
+                // precheck: basedir not specified via apllication nor db but required
+                if (String.IsNullOrWhiteSpace(db.Config.BaseDir) && String.IsNullOrWhiteSpace(baseDir) && !db.CheckFilesHaveAbsolutePath())
+                {
+                    MessageBox.Show("There is no baseDir specified in the database, config and arguments but some files do not have absolute paths.\r\nUnexpected behavior may occur.", "Found incomplete paths", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
             }
 
             // precheck: database current version
@@ -248,6 +206,124 @@ namespace CineBank
             // get data
             movies = Movie.GetMovies(db);
             lbMovies.ItemsSource = movies;
+        }
+
+        // create new database using user input from the CreateDbDialog
+        private void CreateDatabase(string dbPath = "", XmlDocument doc = null)
+        {
+            if (doc == null) // open config if not supplied
+            {
+                doc = new XmlDocument();
+                doc.Load(workingDir + "config.xml");
+            }
+
+            DatabaseConfig? conf = null;
+            if (!String.IsNullOrWhiteSpace(baseDir))
+                conf = new DatabaseConfig(baseDir);
+
+            // get db settings for new db from user
+            CreateDbDialog dlg = new CreateDbDialog(dbPath, baseDir);
+            if (dlg.ShowDialog() == true)
+            {
+                dbPath = dlg.Answer[0];
+                baseDir = dlg.Answer[1];
+                if (!String.IsNullOrWhiteSpace(baseDir))
+                    conf = new DatabaseConfig(baseDir);
+
+                // create new db
+                try
+                {
+                    Database.Init(dbPath, conf);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Failed to create new database at '" + dbPath + "'!\r\n" + ex.Message, "Failed to create new database", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                // update config
+                MessageBoxResult res = MessageBox.Show("Database successfully created.\r\nAdd database path to config (this might fail due to lack of permission and need a checksum refresh - check README)?", "New database", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (res == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        doc.SelectSingleNode("xml/config/dbPath").InnerText = dbPath;
+                        doc.SelectSingleNode("xml/config/baseDir").InnerText = baseDir;
+                        doc.Save(workingDir + "config.xml");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Configuration updated failed: " + ex.Message + "\r\nPlease add dbPath amd baseDir via the PowerShell-script.", "Config update failed", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                }
+
+                // connect to db
+                if (String.IsNullOrWhiteSpace(baseDir)) { baseDir = ""; baseDirSource = "Database"; }
+                db = new Database(dbPath, baseDir);
+
+                // precheck: basedir not specified via apllication nor db but required
+                if (String.IsNullOrWhiteSpace(db.Config.BaseDir) && String.IsNullOrWhiteSpace(baseDir) && !db.CheckFilesHaveAbsolutePath())
+                {
+                    MessageBox.Show("There is no baseDir specified in the database, config and arguments but some files do not have absolute paths.\r\nUnexpected behavior may occur.", "Found incomplete paths", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+            else
+            {
+                MessageBox.Show("No new database created. User aborted.\r\nYou can create or open one via the tooltip.", "No database", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+        }
+
+        // open a database from file
+        private void OpenDatabase()
+        {
+            string dbPath = "";
+
+            // select file
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Title = "Select SQLite Database...";
+            ofd.CheckFileExists = true;
+            ofd.CheckPathExists = true;
+            ofd.Multiselect = false;
+            if (ofd.ShowDialog() == true)
+            {
+                dbPath = ofd.FileName;
+            }
+
+            // check file was selected
+            if (String.IsNullOrWhiteSpace(dbPath) || !File.Exists(dbPath))
+            {
+                MessageBox.Show("Selected path '" + dbPath + "' is empty or file does not exist!", "Failed to open database", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // connect to db
+            if (String.IsNullOrWhiteSpace(baseDir)) { baseDir = ""; baseDirSource = "Database"; }
+            db = new Database(dbPath, baseDir);
+
+            // precheck: basedir not specified via apllication nor db but required
+            if (String.IsNullOrWhiteSpace(db.Config.BaseDir) && String.IsNullOrWhiteSpace(baseDir) && !db.CheckFilesHaveAbsolutePath())
+            {
+                MessageBox.Show("There is no baseDir specified in the database, config and arguments but some files do not have absolute paths.\r\nUnexpected behavior may occur.", "Found incomplete paths", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+
+            // ask if dbpath should be saved
+            MessageBoxResult res = MessageBox.Show("Database successfully opened.\r\nAdd database path to config (this might fail due to lack of permission and need a checksum refresh - check README)?", "Open database", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (res == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    XmlDocument doc = new XmlDocument();
+                    doc.Load(workingDir + "config.xml");
+                    doc.SelectSingleNode("xml/config/dbPath").InnerText = dbPath;
+                    doc.SelectSingleNode("xml/config/baseDir").InnerText = baseDir;
+                    doc.Save(workingDir + "config.xml");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Configuration updated failed: " + ex.Message + "\r\nPlease add dbPath amd baseDir via the PowerShell-script.", "Config update failed", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
         }
 
         // filter for movies
@@ -457,6 +533,21 @@ namespace CineBank
         {
             SettingsWindow settingsWindow = new SettingsWindow(db, baseDirSource);
             settingsWindow.Show();
+        }
+
+        private void MenuItem_CreateDB_Click(object sender, RoutedEventArgs e)
+        {
+            CreateDatabase();
+            movies = Movie.GetMovies(db);
+            lbMovies.ItemsSource = movies;
+
+        }
+
+        private void MenuItem_OpenDB_Click(object sender, RoutedEventArgs e)
+        {
+            OpenDatabase();
+            movies = Movie.GetMovies(db);
+            lbMovies.ItemsSource = movies;
         }
 
         // display windows to add a new movie. pass null to constructor to ensure a new movie-object will be created.

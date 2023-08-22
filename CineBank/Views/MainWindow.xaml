@@ -19,8 +19,8 @@
                     <MenuItem Header="_Settings (F6)" Click="MenuItem_Settings_Click"/>
                     <MenuItem Header="_Refresh (F5)" Click="MenuItem_Reload_Click"/>
                     <Separator />
-                    <MenuItem Header="_Open Database"  Click="MenuItem_NotImplemented_Click"/>
-                    <MenuItem Header="_New Database" Click="MenuItem_NotImplemented_Click"/>
+                    <MenuItem Header="_Open Database"  Click="MenuItem_OpenDB_Click"/>
+                    <MenuItem Header="_New Database" Click="MenuItem_CreateDB_Click"/>
                     <Separator />
                     <MenuItem Header="_Exit" Click="MenuItem_Exit_Click"/>
                 </MenuItem>
