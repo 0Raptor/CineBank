@@ -193,7 +193,10 @@ namespace CineBank.Classes
                     }
 
                     // update obj
-                    obj.CoverPath = path;
+                    if (!String.IsNullOrWhiteSpace(posterDir))
+                        obj.CoverPath = path.Substring(posterDir.Length); // store relative path if given
+                    else
+                        obj.CoverPath = path; // store full path
                 }
 
                 // return result

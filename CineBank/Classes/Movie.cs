@@ -303,7 +303,7 @@ namespace CineBank.Classes
                 for (int i = 1; i < res.Length; i++) // add each linked file as new object to the list
                 {
                     files.Add(new LinkedFile(Convert.ToInt64(res[i][0]), (LinkedFile.FileType)Convert.ToInt32(res[i][2]),
-                        (LinkedFile.OpenWith)Convert.ToInt32(res[i][3]), baseDir + res[i][4]));
+                        (LinkedFile.OpenWith)Convert.ToInt32(res[i][3]), res[i][4]));
                 }
                 Files = files.ToArray();
             }

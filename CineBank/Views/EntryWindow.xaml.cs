@@ -263,9 +263,14 @@ namespace CineBank
                     oldCover.Delete(db);
                 }
 
+                // remove file path if relative paths are used
+                string path = ofd.FileName;
+                if (!String.IsNullOrWhiteSpace(db.Config.BaseDir))
+                    path = path.Replace(db.Config.BaseDir, "");
+
                 // store new cover
-                mov.CoverPath = ofd.FileName;
-                LinkedFile lf = new LinkedFile(LinkedFile.FileType.Image, LinkedFile.OpenWith.None, ofd.FileName);
+                mov.CoverPath = tbImage.Text = ofd.FileName;
+                LinkedFile lf = new LinkedFile(LinkedFile.FileType.Image, LinkedFile.OpenWith.None, path);
                 files.Add(lf);
                 lbFiles.Items.Refresh();
             }

@@ -135,7 +135,7 @@ namespace CineBank
 
             // precheck: database (xml/config/dbPath or 'commandline arg 1' exist)
             string dbPath = "";
-            if (args.Length > 2 && !String.IsNullOrWhiteSpace(args[1])) // use db from commandline args
+            if (args.Length >= 2 && !String.IsNullOrWhiteSpace(args[1])) // use db from commandline args
             {
                 dbPath = args[1];            
             }
@@ -151,7 +151,7 @@ namespace CineBank
                 }
             }
             // precheck: basedir specified via apllication
-            if (args.Length > 3 && !String.IsNullOrWhiteSpace(args[2])) // use baseDir from commandline args
+            if (args.Length >= 3 && !String.IsNullOrWhiteSpace(args[2])) // use baseDir from commandline args
             {
                 baseDir = args[2];
                 baseDirSource = "Arguments";
@@ -160,8 +160,12 @@ namespace CineBank
             {
                 try
                 {
-                    baseDir = doc.SelectSingleNode("xml/config/baseDir").InnerText;
-                    baseDirSource = "config.xml";
+                    string tmp = doc.SelectSingleNode("xml/config/baseDir").InnerText;
+                    if (!String.IsNullOrWhiteSpace(tmp))
+                    {
+                        baseDir = tmp;
+                        baseDirSource = "config.xml";
+                    }
                 }
                 catch
                 {
@@ -382,6 +386,9 @@ namespace CineBank
                         continue;
                     cbPlay.Items.Add(item);
                 }
+                // select first playable file
+                if (cbPlay.Items.Count > 0)
+                    cbPlay.SelectedIndex = 0;
             } catch
             {
                 imgCoverPath.Source = null;
@@ -448,7 +455,7 @@ namespace CineBank
             }
 
             // open file using the selected script
-            string scriptArguments = "-File \"" + script + "\" -path \"" + path + "\" -dir \"" + dir + "\""; // -ExecutionPolicy Bypass
+            string scriptArguments = "-File \"" + script + "\" -path \"" + baseDir + path + "\" -dir \"" + dir + "\""; // -ExecutionPolicy Bypass
             Process.Start("powershell.exe", scriptArguments);
         }
 
