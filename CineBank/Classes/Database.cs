@@ -318,6 +318,16 @@ namespace CineBank.Classes
         }
 
         /// <summary>
+        /// Backup the database into a file
+        /// </summary>
+        /// <param name="targetPath">File to store the backup in. Will be overwritten if existent.</param>
+        public void Backup(string targetPath)
+        {
+            string source = Connection.FileName;
+            System.IO.File.Copy(source, targetPath, true);
+        }
+
+        /// <summary>
         /// Create a new SQLite-Database at the given location
         /// </summary>
         /// <param name="path">Path to the file storing the SQLite-Database</param>

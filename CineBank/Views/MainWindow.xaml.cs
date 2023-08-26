@@ -613,6 +613,23 @@ namespace CineBank
             EditHelperScripts(HelperScripts["AudioPlayer"]);
         }
 
+        private void MenuItem_BackupDB_Click(object sender, RoutedEventArgs e)
+        {
+            // check if db is present
+            if (db == null)
+                return;
+
+            // select file to backup to
+            SaveFileDialog dlg = new SaveFileDialog();
+            dlg.Title = "Select location for backup...";
+            dlg.OverwritePrompt = true;
+            if (dlg.ShowDialog() == true)
+            {
+                // backup db
+                db.Backup(dlg.FileName);
+            }
+        }
+
         private void btnSearch_Click(object sender, RoutedEventArgs e)
         {
             FilterMovies();

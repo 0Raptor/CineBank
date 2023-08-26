@@ -7,6 +7,12 @@ The execution is realized through customizable PowerShell-scripts to grant you f
 Mounting your ISOs or playing any type of media file with any software can be achieved easily.
 To avoid unauthorized users messing with your scripts, integrity checks can be enabled.
 
+This tool will give you full control about what happens to your information. All information about your movies is stored locally 
+on your device (except if you decide to store the database anywhere else). No information will be sent to external services.  
+To obtain additional information for your entries, you can optionally use the API from [TMDB](https://www.themoviedb.org/). But this feature is 
+disabled until you supply an API-Key. And even then, the application will never fetch information automatically, but while adding or editing an entry you can
+search for information using a searchbar and a manual button click.
+
 For information about the design of the application, check the [Developer Manual](DEV.md).
 
 ## Installation
@@ -55,6 +61,7 @@ Ideas that might be implemented in the future:
 1. Implement filtering for genre, languages, etc. during search
 2. Implement additional DBMS through turning Database-class into a virtual class and creating derived classes for each DBMS.
 3. Store information about people (Cast, Director, Score) in own table.
+4. Darkmode
 
 ## License
 

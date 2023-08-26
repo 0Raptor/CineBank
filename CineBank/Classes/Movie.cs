@@ -395,6 +395,10 @@ namespace CineBank.Classes
             string[] languges = Languages.Split(',');
             foreach (string lang in languges)
             {
+                // skip empty entries
+                if (String.IsNullOrWhiteSpace(lang))
+                    continue;
+
                 // make sure language is exisitng
                 string query = "INSERT OR IGNORE INTO languages(Name) VALUES(@lang);";
                 query = db.PrepareSecureSQLStatement(query, new Dictionary<string, string>
@@ -415,6 +419,10 @@ namespace CineBank.Classes
             string[] subtitles = Subtitles.Split(',');
             foreach (string lang in subtitles)
             {
+                // skip empty entries
+                if (String.IsNullOrWhiteSpace(lang))
+                    continue;
+
                 // make sure language is exisitng
                 string query = "INSERT OR IGNORE INTO languages(Name) VALUES(@lang);";
                 query = db.PrepareSecureSQLStatement(query, new Dictionary<string, string>
@@ -435,6 +443,10 @@ namespace CineBank.Classes
             string[] audioDesc = AudioDescription.Split(',');
             foreach (string lang in audioDesc)
             {
+                // skip empty entries
+                if (String.IsNullOrWhiteSpace(lang))
+                    continue;
+
                 // make sure language is exisitng
                 string query = "INSERT OR IGNORE INTO languages(Name) VALUES(@lang);";
                 query = db.PrepareSecureSQLStatement(query, new Dictionary<string, string>
@@ -455,6 +467,10 @@ namespace CineBank.Classes
             string[] genre = Genre.Split(',');
             foreach (string g in genre)
             {
+                // skip empty entries
+                if (String.IsNullOrWhiteSpace(g))
+                    continue;
+
                 // make sure genre is exisitng
                 string query = "INSERT OR IGNORE INTO genres(Name) VALUES(@g);";
                 query = db.PrepareSecureSQLStatement(query, new Dictionary<string, string>

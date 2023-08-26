@@ -21,6 +21,7 @@
                     <Separator />
                     <MenuItem Header="_Open Database"  Click="MenuItem_OpenDB_Click"/>
                     <MenuItem Header="_New Database" Click="MenuItem_CreateDB_Click"/>
+                    <MenuItem Header="_Save Database Backup" Click="MenuItem_BackupDB_Click"/>
                     <Separator />
                     <MenuItem Header="_Exit" Click="MenuItem_Exit_Click"/>
                 </MenuItem>
@@ -65,7 +66,7 @@
                     <Button Grid.Column="1" x:Name="btnSearch" Click="btnSearch_Click" Margin="0, 5">Search</Button>
                 </Grid>
 
-                <ListBox Grid.Row="1" Margin="5,0,0,5" HorizontalContentAlignment="Stretch" Name="lbMovies" SelectionChanged="lbMovies_SelectionChanged">
+                <ListBox Grid.Row="1" Margin="5,0,0,5" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch" Name="lbMovies" SelectionChanged="lbMovies_SelectionChanged">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Grid>
@@ -97,9 +98,9 @@
                                         <TextBlock Grid.Column="1" Grid.Row="0" Text="Type:" FontSize="14"></TextBlock>
                                         <TextBlock Grid.Column="2" Grid.Row="0" Text="Length:" FontSize="14"></TextBlock>
 
-                                        <TextBlock Grid.Column="0" Grid.Row="1" Text="{Binding Genre}" FontSize="14"></TextBlock>
-                                        <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Type}" FontSize="14"></TextBlock>
-                                        <TextBlock Grid.Column="2" Grid.Row="1" Text="{Binding Duration}" FontSize="14"></TextBlock>
+                                        <TextBlock Grid.Column="0" Grid.Row="1" Text="{Binding Genre}" FontSize="14" TextWrapping="Wrap"></TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Type}" FontSize="14" TextWrapping="Wrap"></TextBlock>
+                                        <TextBlock Grid.Column="2" Grid.Row="1" Text="{Binding Duration}" FontSize="14" TextWrapping="Wrap"></TextBlock>
                                     </Grid>
                                 </Grid>
                             </Grid>

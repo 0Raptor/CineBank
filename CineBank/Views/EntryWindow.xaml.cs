@@ -255,6 +255,14 @@ namespace CineBank
             ofd.Multiselect = false;
             if (ofd.ShowDialog() == true) // new file was selected
             {
+                // check if new cover is in basedir if basedir is used
+                if (!String.IsNullOrWhiteSpace(db.Config.BaseDir) && !ofd.FileName.StartsWith(db.Config.BaseDir))
+                {
+                    MessageBox.Show("Selected file '" + ofd.FileName + "' is not part of the content root/ basePath '" + db.Config.BaseDir + "'!\r\nSince your database is configured to use relative paths this file cannot be added.",
+                        "File not part of content root directory", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 // remove old cover
                 if (oldCover != null)
                 {
