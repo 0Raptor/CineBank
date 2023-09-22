@@ -144,7 +144,7 @@ namespace CineBank.Classes
                         if (!format.Contains("DVD Folder, ")) format += "DVD Folder, ";
                         break;
                     case LinkedFile.FileType.BRFolder:
-                        if (!format.Contains("Blu-ray Folder, ")) format += "Blu -ray Folder, ";
+                        if (!format.Contains("Blu-ray Folder, ")) format += "Blu-ray Folder, ";
                         break;
                     case LinkedFile.FileType.AVCHDFolder:
                         if (!format.Contains("AVCHD Folder, ")) format += "AVCHD Folder, ";

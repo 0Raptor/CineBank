@@ -6,6 +6,13 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>CineBank_Icon.ico</ApplicationIcon>
+    <Authors>0Raptor</Authors>
+    <Company />
+    <PackageProjectUrl>https://github.com/0Raptor/CineBank</PackageProjectUrl>
+    <Copyright>GNU GPL v3</Copyright>
+    <PackageReleaseNotes>1.0</PackageReleaseNotes>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/0Raptor/CineBank</RepositoryUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

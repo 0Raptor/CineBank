@@ -580,7 +580,7 @@ namespace CineBank
 
         private void MenuItem_Help_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start(@"https://github.com/0Raptor/CineBank");
+            Process.Start("explorer.exe", @"https://github.com/0Raptor/CineBank");
         }
 
         private void EditHelperScripts(string path)

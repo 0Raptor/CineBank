@@ -181,7 +181,8 @@ namespace CineBank
                 // success
                 // insert values into mov-object AND ui-elements 'cause binding might not update
 
-                // update info
+                // update info and check current poster
+                string poster = "";
                 tbTitle.Dispatcher.Invoke(() => // use dispatcher to access main thread from this background job!
                 {
                     mov.Title = tbTitle.Text = res.Title;
@@ -191,10 +192,11 @@ namespace CineBank
                     mov.Cast = tbCast.Text = String.Join(", ", res.Cast);
                     mov.Director = tbDirector.Text = res.Director;
                     mov.Score = tbScore.Text = res.Score;
+                    poster = tbImage.Text;
                 });
 
-                // update cover if supplied
-                if (!String.IsNullOrWhiteSpace(res.CoverPath))
+                // update cover if supplied and not already set
+                if (!String.IsNullOrWhiteSpace(res.CoverPath) && poster != res.CoverPath)
                 {
                     LinkedFile lf = new LinkedFile(LinkedFile.FileType.Image, LinkedFile.OpenWith.None, res.CoverPath);
                     tbImage.Dispatcher.Invoke(() => // use dispatcher to access main thread from this background job!
