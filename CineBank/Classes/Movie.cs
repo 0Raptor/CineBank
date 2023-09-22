@@ -538,7 +538,7 @@ namespace CineBank.Classes
             }
 
             // get data and check results
-            string[][] res = db.Query(sql + ";");
+            string[][] res = db.Query(sql + " ORDER BY Title COLLATE NOCASE ASC;");
             if (res == null || res.Length <= 1)
             {
                 Console.WriteLine("INFO: No movies where found.");
